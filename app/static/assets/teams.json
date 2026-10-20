@@ -1,0 +1,102 @@
+{
+  "Arsenal": {
+    "src": "/static/assets/arsenal.png",
+    "wikipedia": "https://en.wikipedia.org/wiki/Arsenal_F.C.",
+    "image_source": "https://thumb.wikimedia.org/wikipedia/en/thumb/5/53/Arsenal_FC.svg/330px-Arsenal_FC.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  },
+  "Aston Villa": {
+    "src": "/static/assets/aston-villa.png",
+    "wikipedia": "https://en.wikipedia.org/wiki/Aston_Villa_F.C.",
+    "image_source": "https://thumb.wikimedia.org/wikipedia/en/thumb/9/9a/Aston_Villa_FC_new_crest.svg/330px-Aston_Villa_FC_new_crest.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  },
+  "Chelsea": {
+    "src": "/static/assets/chelsea.png",
+    "wikipedia": "https://en.wikipedia.org/wiki/Chelsea_F.C.",
+    "image_source": "https://thumb.wikimedia.org/wikipedia/en/thumb/c/cc/Chelsea_FC.svg/330px-Chelsea_FC.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  },
+  "Crystal Palace": {
+    "src": "/static/assets/crystal-palace.png",
+    "wikipedia": "https://en.wikipedia.org/wiki/Crystal_Palace_F.C.",
+    "image_source": "https://thumb.wikimedia.org/wikipedia/en/thumb/a/a2/Crystal_Palace_FC_logo_%282022%29.svg/330px-Crystal_Palace_FC_logo_%282022%29.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  },
+  "Everton": {
+    "src": "/static/assets/everton.png",
+    "wikipedia": "https://en.wikipedia.org/wiki/Everton_F.C.",
+    "image_source": "https://thumb.wikimedia.org/wikipedia/en/thumb/7/7c/Everton_FC_logo.svg/330px-Everton_FC_logo.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  },
+  "Leicester City": {
+    "src": "/static/assets/leicester-city.png",
+    "wikipedia": "https://en.wikipedia.org/wiki/Leicester_City_F.C.",
+    "image_source": "https://thumb.wikimedia.org/wikipedia/en/thumb/2/2d/Leicester_City_crest.svg/330px-Leicester_City_crest.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  },
+  "Liverpool": {
+    "src": "/static/assets/liverpool.png",
+    "wikipedia": "https://en.wikipedia.org/wiki/Liverpool_F.C.",
+    "image_source": "https://thumb.wikimedia.org/wikipedia/en/thumb/0/0c/Liverpool_FC.svg/330px-Liverpool_FC.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  },
+  "Manchester City": {
+    "src": "/static/assets/manchester-city.png",
+    "wikipedia": "https://en.wikipedia.org/wiki/Manchester_City_F.C.",
+    "image_source": "https://thumb.wikimedia.org/wikipedia/en/thumb/e/eb/Manchester_City_FC_badge.svg/330px-Manchester_City_FC_badge.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  },
+  "Manchester United": {
+    "src": "/static/assets/manchester-united.png",
+    "wikipedia": "https://en.wikipedia.org/wiki/Manchester_United_F.C.",
+    "image_source": "https://thumb.wikimedia.org/wikipedia/en/thumb/7/7a/Manchester_United_FC_crest.svg/330px-Manchester_United_FC_crest.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  },
+  "Newcastle United": {
+    "src": "/static/assets/newcastle-united.png",
+    "wikipedia": "https://en.wikipedia.org/wiki/Newcastle_United_F.C.",
+    "image_source": "https://thumb.wikimedia.org/wikipedia/en/thumb/8/87/Newcastle_United_FC_2026_crest.svg/330px-Newcastle_United_FC_2026_crest.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  },
+  "Norwich City": {
+    "src": "/static/assets/norwich-city.png",
+    "wikipedia": "https://en.wikipedia.org/wiki/Norwich_City_F.C.",
+    "image_source": "https://thumb.wikimedia.org/wikipedia/en/thumb/1/17/Norwich_City_FC_logo.svg/330px-Norwich_City_FC_logo.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  },
+  "Southampton": {
+    "src": "/static/assets/southampton.png",
+    "wikipedia": "https://en.wikipedia.org/wiki/Southampton_F.C.",
+    "image_source": "https://thumb.wikimedia.org/wikipedia/en/thumb/c/c9/FC_Southampton.svg/330px-FC_Southampton.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  },
+  "Stoke City": {
+    "src": "/static/assets/stoke-city.png",
+    "wikipedia": "https://en.wikipedia.org/wiki/Stoke_City_F.C.",
+    "image_source": "https://thumb.wikimedia.org/wikipedia/en/thumb/b/bf/Stoke_City_FC_crest_2026.svg/330px-Stoke_City_FC_crest_2026.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  },
+  "Sunderland": {
+    "src": "/static/assets/sunderland.png",
+    "wikipedia": "https://en.wikipedia.org/wiki/Sunderland_A.F.C.",
+    "image_source": "https://thumb.wikimedia.org/wikipedia/en/thumb/7/77/Logo_Sunderland.svg/330px-Logo_Sunderland.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  },
+  "Swansea City": {
+    "src": "/static/assets/swansea-city.png",
+    "wikipedia": "https://en.wikipedia.org/wiki/Swansea_City_A.F.C.",
+    "image_source": "https://thumb.wikimedia.org/wikipedia/en/thumb/f/f9/Swansea_City_AFC_logo.svg/330px-Swansea_City_AFC_logo.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  },
+  "Tottenham Hotspur": {
+    "src": "/static/assets/tottenham-hotspur.png",
+    "wikipedia": "https://en.wikipedia.org/wiki/Tottenham_Hotspur_F.C.",
+    "image_source": "https://thumb.wikimedia.org/wikipedia/en/thumb/b/b4/Tottenham_Hotspur.svg/330px-Tottenham_Hotspur.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  },
+  "Watford": {
+    "src": "/static/assets/watford.png",
+    "wikipedia": "https://en.wikipedia.org/wiki/Watford_F.C.",
+    "image_source": "https://thumb.wikimedia.org/wikipedia/en/thumb/e/e2/Watford.svg/330px-Watford.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  },
+  "West Bromwich Albion": {
+    "src": "/static/assets/west-bromwich-albion.png",
+    "wikipedia": "https://en.wikipedia.org/wiki/West_Bromwich_Albion_F.C.",
+    "image_source": "https://thumb.wikimedia.org/wikipedia/en/thumb/8/8b/West_Bromwich_Albion.svg/330px-West_Bromwich_Albion.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  },
+  "West Ham United": {
+    "src": "/static/assets/west-ham-united.png",
+    "wikipedia": "https://en.wikipedia.org/wiki/West_Ham_United_F.C.",
+    "image_source": "https://thumb.wikimedia.org/wikipedia/en/thumb/c/c2/West_Ham_United_FC_logo.svg/330px-West_Ham_United_FC_logo.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  },
+  "AFC Bournemouth": {
+    "src": "/static/assets/bournemouth.png",
+    "wikipedia": "https://en.wikipedia.org/wiki/AFC_Bournemouth",
+    "image_source": "https://thumb.wikimedia.org/wikipedia/en/thumb/e/e5/AFC_Bournemouth_%282013%29.svg/330px-AFC_Bournemouth_%282013%29.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  }
+}

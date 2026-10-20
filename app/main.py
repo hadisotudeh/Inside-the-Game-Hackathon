@@ -1,0 +1,78 @@
+"""HTTP entry point; replay and intelligence features will be added separately."""
+
+from pathlib import Path
+from typing import Annotated
+
+import httpx
+from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.staticfiles import StaticFiles
+
+from app.config import Settings
+from app.explanations import Audience, ExplanationProvider
+from app.replay import replay
+from app.source import StatsBombSource
+
+
+def create_app() -> FastAPI:
+    settings = Settings()
+    application = FastAPI(title=settings.app_name, version="0.1.0")
+    application.state.source = StatsBombSource()
+    application.state.explanations = ExplanationProvider(settings)
+    static = Path(__file__).parent / "static"
+    application.mount("/static", StaticFiles(directory=static), name="static")
+
+    @application.get("/", include_in_schema=False)
+    async def home():
+        return FileResponse(static / "index.html")
+
+    @application.get("/overlay", include_in_schema=False)
+    async def overlay():
+        return FileResponse(static / "overlay.html")
+
+    async def load(awaitable):
+        try:
+            return await awaitable
+        except httpx.HTTPStatusError as exc:
+            raise HTTPException(502, "StatsBomb returned an unsuccessful response") from exc
+        except (httpx.RequestError, ValueError) as exc:
+            raise HTTPException(502, "Could not load StatsBomb data") from exc
+
+    @application.get("/matches", tags=["replay"])
+    async def matches():
+        return await load(application.state.source.matches())
+
+    @application.get("/matches/{match_id}/stream", tags=["replay"])
+    async def stream(
+        match_id: int,
+        request: Request,
+        speed: Annotated[float, Query(ge=0.1, le=1000, allow_inf_nan=False)] = 1,
+        audience: Audience = "casual",
+        insights: bool = False,
+    ):
+        catalog = await load(application.state.source.matches())
+        match = next((m for m in catalog if m["match_id"] == match_id), None)
+        if match is None:
+            raise HTTPException(404, "Match not found in selected source")
+        events = await load(application.state.source.events(match_id))
+        return StreamingResponse(
+            replay(
+                events,
+                match,
+                speed,
+                request.is_disconnected,
+                application.state.explanations if insights else None,
+                audience,
+            ),
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+        )
+
+    @application.get("/health", tags=["operations"])
+    def health() -> dict[str, str]:
+        return {"status": "ok"}
+
+    return application
+
+
+app = create_app()

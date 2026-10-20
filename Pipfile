@@ -1,0 +1,24 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+fastapi = "*"
+uvicorn = "*"
+httpx = "*"
+pydantic-settings = "*"
+
+[dev-packages]
+pytest = "*"
+ruff = "*"
+
+[requires]
+python_version = "3.14"
+
+[scripts]
+dev = "uvicorn app.main:app --reload --host 127.0.0.1 --port 8000"
+start = "uvicorn app.main:app --host 0.0.0.0 --port 8000"
+test = "python -m pytest"
+lint = "ruff check ."
+format = "ruff format ."

@@ -218,3 +218,25 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local datasets and credentials
+/data/raw/
+/data/cache/
+/data/statsbomb/
+/data/downloads/
+.env.*
+!.env.example
+
+# Local tool configuration and credentials
+/.aws/
+/.codex/
+/.agents/
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+.env
+.example
+.github/
+.python-version
