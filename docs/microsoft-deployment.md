@@ -2,13 +2,16 @@
 
 ## Status
 
-The application currently runs locally with Pipenv. No Azure resources are
-provisioned and no real model call has been made during development. An optional
-Microsoft Foundry Azure OpenAI v1 adapter is implemented with mocked HTTP tests;
-it still needs credentials and a real deployment smoke check. Default template
-mode makes no model calls. This is not a deployed architecture.
-The repository includes a GitHub Actions Python-check workflow; its presence
-does not establish Microsoft AI platform integration or a successful CI run.
+The application runs locally with Pipenv. **Microsoft Agent Framework is integrated
+and has executed a real Gemini-backed question workflow during development.**
+The revised historical-match recording encountered a real Gemini HTTP 429 quota
+error, which is explicitly labeled in the video. This is Microsoft orchestration
+with a Google model, not Microsoft-hosted inference.
+
+No Azure resources are provisioned. The separate Microsoft Foundry Azure OpenAI
+v1 adapter has mocked HTTP tests but still needs a real deployment smoke check.
+Template explanations make no model calls. The repository's GitHub Actions
+workflow does not establish successful CI or Azure deployment.
 
 ## Component mapping
 
@@ -17,12 +20,12 @@ does not establish Microsoft AI platform integration or a successful CI run.
 | Fixture selection and event replay | FastAPI, StatsBomb HTTP source, per-connection replay | Containerize and run in Azure Container Apps |
 | Momentum and shot map data | Deterministic Python calculations | Run inside the same application container |
 | Explanations and personalization | Optional Foundry adapter; casual/analyst modes, templates by default; live verification pending | Microsoft Foundry Azure OpenAI v1 chat completions |
-| Match questions and tool use | Not implemented | Optional Microsoft Agent Framework agent with read-only match-state tools |
+| Match questions and tool use | Implemented Microsoft Agent Framework evidence/narration workflow with three read-only tools and Gemini inference | Retain the workflow; add authoritative server sessions and evaluate a Microsoft-hosted model integration separately |
 | Viewer updates | Direct SSE, no resume | Optional Azure Web PubSub WebSockets for match/session groups |
 | Observability | Not implemented | Application Insights traces, latency metrics, and errors |
 
-The browser matchroom and transparent same-browser overlay preview are
-implemented. The public app uses StatsBomb exclusively. See
+The browser matchroom and broadcast-style overlay are implemented. The overlay
+can start its own replay or join a matchroom in the same browser. The public app uses StatsBomb exclusively. See
 [the demo guide](demo.md) for their capabilities and limits.
 
 ## Proposed implementation sequence
@@ -34,8 +37,9 @@ implemented. The public app uses StatsBomb exclusively. See
 3. Extend the implemented shot-triggered explanations to other meaningful moments.
    Snapshot isolation, event references, casual/analyst modes, background inference,
    bounded requests, and failure fallbacks are already implemented.
-4. Exercise the real Microsoft integration before submission, record its actual
-   output, and provide reproducible setup and judge-access instructions.
+4. Evaluate the implemented Agent Framework/Gemini workflow, restore usable
+   provider quota for judge testing, and verify Foundry separately before claiming
+   Foundry inference. Provide reproducible setup and judge-access instructions.
 5. Prepare and test a container image and deployment configuration. Deploy to
    Azure only when cloud hosting is needed; document resources and associated costs.
 
@@ -76,8 +80,9 @@ the judges' decision. A disabled integration tested only with mocks is not evide
 that the service actually works. We should demonstrate a real integration before
 claiming it in the pitch.
 
-The submission still needs live-verified AI integration, a public repository,
-judge access, and a demo under two minutes. Casual/analyst personalization and
+The submission still needs a public repository, judge access with usable model
+quota, and a public URL for the recorded demo under two minutes. Agent Framework
+with Gemini has been exercised; real Foundry verification remains open. Casual/analyst personalization and
 on-screen insights are implemented. Synthetic selection has been removed from the public app. The generator remains
 an internal development utility; the synthetic-data requirement is still open.
 

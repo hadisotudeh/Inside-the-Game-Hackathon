@@ -236,3 +236,7 @@ __marimo__/
 .DS_Store
 Thumbs.db
 .vscode
+
+# Generated demo recordings and audio (keep scripts and captions in Git)
+/artifacts/
+tools/

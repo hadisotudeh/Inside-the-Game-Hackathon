@@ -1,12 +1,117 @@
-# Inside the Game
+# Touchline
 
-An early foundation for a personalized football intelligence experience for the
-Microsoft / Premier League Inside the Game hackathon.
+### See the game. Understand the story.
 
-## Local setup
+**Touchline turns football event data into on-screen match intelligence and AI-powered explanations—designed for live TV and streaming experiences.**
 
-Requires Python 3.14 and Pipenv. Python 3.14 matches the development machine.
-Run commands from the repository root:
+A score tells you what happened. Touchline helps you explore who is creating the danger, how teams connect their passes, and what the numbers mean. Watch the match unfold, inspect the evidence, or ask a question in everyday language.
+
+Built for the **Microsoft × Premier League Inside the Game Developer Hackathon**. The current application is a working local prototype with **Microsoft Agent Framework orchestration, Gemini-powered match questions, historical event replay, and an optional Microsoft Foundry explanation adapter**.
+
+![Touchline overlay showing Chelsea–Arsenal event positions, chance quality, momentum, passing networks and match questions](docs/images/touchline-overlay.png)
+
+## The demo: a Premier League match, one event at a time
+
+Open **[http://127.0.0.1:8000/overlay](http://127.0.0.1:8000/overlay)** after starting the app.
+
+The intended experience sits alongside live match footage. To avoid redistributing copyrighted broadcast video, this demonstration uses an **event-data pitch** in its place. This is a visualization of recorded actions, not reconstructed match video or continuous player tracking.
+
+**What is event data?** A timestamped record of individual football actions: who passed, where a shot was taken, its outcome, and other recorded context. In a live Premier League deployment, those events would arrive through a licensed data provider's API.
+
+For this case study, Touchline uses **publicly available historical Premier League 2015/16 event data from [Hudl / StatsBomb Open Data](https://github.com/hudl/open-data)**. The recorded demo follows **Chelsea–Arsenal, September 19, 2015**. The server downloads the event file, then streams actions **one at a time, in match order**, through Server-Sent Events (SSE). The score, pitch and analytics update only as events are emitted. This demonstrates the event-processing experience; a production live feed and synchronization with broadcast footage remain future integrations.
+
+The **1:58 narrated demo** explains the live-TV concept, event data, sequential replay and AI workflow. Its local file is `artifacts/demo-real/touchline-demo-real-match.mp4`; generated video files are ignored by Git. See the [demo package and reproduction instructions](artifacts/demo-real/README.md). A public hosted video URL still needs to be added to the submission.
+
+> **Data distinction:** the public application currently uses historical data. The hackathon also requires synthetic, football-realistic events; this case study alone does not meet that requirement. The repository includes a separate seeded synthetic demo build, described below.
+
+## What you can explore
+
+| Experience | What it helps a viewer understand |
+| --- | --- |
+| Event-data pitch and score | Follow recorded actions, player identities, the replay clock and goals as they arrive. |
+| Shot map | Compare chance locations and supplied expected goals (xG). Larger markers mean higher xG; filled markers identify goals. |
+| Match momentum | See attacking progression from completed open-play passes and carries using expected threat (xT). This is not win probability. |
+| Top statistics | Compare estimated possession, shots, shots on target, pass completion and field tilt. |
+| Passing network | Explore average pass/reception positions and connections between players; switch the team being inspected. |
+| Shot snapshots | Inspect recorded shot-time player positions where available, rather than implying continuous tracking. |
+| Ask the match | Ask about chance quality, territorial control or player involvement using the match context available so far. |
+
+The overlay fits a landscape broadcast-style canvas. It starts its own replay and can also receive updates from a matchroom tab in the same browser. The main matchroom is available at **[http://127.0.0.1:8000/](http://127.0.0.1:8000/)**.
+
+Personalization currently comes from the viewer's questions, team selection and shot exploration. Overlay chat uses casual-fan language; the chat API also supports an analyst mode. Favorite-player profiles and multilingual narration are future work.
+
+## The AI: evidence first, explanation second
+
+Touchline uses AI to explain measured match context. Routine scorekeeping and statistics are calculated in Python rather than delegated to a language model.
+
+Example questions include:
+
+- **“Who has created the better chances so far?”** Compare match-to-date chance quality.
+- **“What does field tilt tell us?”** Explain territorial control in plain language.
+- **“Who is most involved in the passing network?”** Explore the current player-network window.
+
+### Microsoft Agent Framework + Gemini
+
+Every question runs through an isolated **[Microsoft Agent Framework workflow](https://learn.microsoft.com/en-us/agent-framework/workflows/workflows)** in [app/chat_workflow.py](app/chat_workflow.py):
+
+1. **Collect evidence.** `MatchEvidence` invokes three read-only tools: `get_match_stats`, `get_recent_events` and `get_player_summary`.
+2. **Generate an explanation.** `MatchNarrator` hands that evidence to the Gemini integration in [app/chat.py](app/chat.py), requesting a short answer for the selected audience.
+3. **Validate and render.** The backend validates the response schema and checks cited event IDs against the supplied event excerpt. The UI displays the answer's snapshot time and supporting events when supplied.
+
+This is a real Microsoft orchestration integration with a Google model. Tool selection and the handoff are deterministic; the two executors are not presented as independently reasoning autonomous agents. It is not a Microsoft-hosted Gemini deployment.
+
+```mermaid
+flowchart LR
+    Data[Historical event data] --> Replay[Ordered SSE replay]
+    Replay --> State[Incremental analytics]
+    State --> Screen[Overlay and matchroom]
+    Screen -->|Question + replay snapshot| Evidence[Agent Framework: evidence tools]
+    Evidence --> Narrator[Agent Framework: narrator]
+    Narrator --> Gemini[Gemini inference]
+    Gemini --> Check[Schema and citation checks]
+    Check --> Screen
+```
+
+### Grounding and failure behavior
+
+Each question captures the current score, match totals, passing networks and at most **60 recent events**. Future events and final-result fields are excluded from the supplied snapshot. Player summaries describe the current passing-network window, which resets after substitutions or sending-offs; they are not full-match player totals.
+
+These controls improve traceability, but do not prove every sentence is correct. Aggregate comparisons may have no individual event citations. The prototype currently trusts the viewing client's snapshot; public deployment needs authoritative server-side match sessions.
+
+A real Gemini answer was verified during the earlier synthetic demo. The revised historical-match recording encountered **HTTP 429 quota exhaustion** and states that limitation explicitly. Provider failures are displayed as errors; no canned response is passed off as AI output. Replay and analytics continue independently of chat inference.
+
+### Optional Microsoft Foundry explanations
+
+A separate shot-triggered explanation path supports casual/analyst output through **Microsoft Foundry**, using Azure OpenAI v1 chat completions and JSON-schema validation. Its local default is a deterministic template marked `ai_generated=false`.
+
+This adapter is implemented but **has not been verified against a real Foundry deployment**. It serves the optional SSE insight path, not the Gemini chat endpoint. See the configuration below before claiming Foundry usage.
+
+## Where Microsoft technologies fit
+
+The working Agent Framework integration provides the foundation. Additional services have specific roles as the prototype moves toward a shared broadcast deployment:
+
+| Microsoft technology | Role in Touchline | Status |
+| --- | --- | --- |
+| **Microsoft Agent Framework** | Coordinate evidence collection and narration, with explicit tool boundaries and a per-question handoff. | **Implemented locally**; real Gemini inference verified in development. |
+| **Microsoft Foundry** | Generate structured explanations for important moments through the existing optional provider. | Adapter implemented; real deployment verification pending. |
+| **Azure Container Apps** | Host the FastAPI application and analytics service. | Proposed; no container image or Azure deployment included yet. |
+| **Azure Web PubSub** | Deliver shared match updates to viewer groups rather than independently replaying every connection. | Proposed; requires authoritative sessions, sequencing and recovery. |
+| **Azure Monitor / Application Insights** | Measure event-to-screen latency, workflow errors and model response times. | Proposed; instrumentation and benchmarks remain to be built. |
+| **Azure Key Vault and managed identity** | Manage deployment secrets and access as cloud integrations are introduced. | Proposed; the local app uses server-side environment variables. |
+
+These choices support the hackathon's emphasis on Microsoft AI, explainable intelligence and broadcast applicability. They are a deployment direction, not claims of completed cloud integration. See the [Microsoft integration and deployment plan](docs/microsoft-deployment.md).
+
+## Keep routine updates cheap; use AI where it adds value
+
+Touchline can run its replay, charts and statistics locally without an AI key or cloud provisioning. The frontend uses plain JavaScript/SVG, with no Node build step. Match questions trigger inference **only when the viewer asks**, rather than once for every pass or chart update.
+
+The optional Foundry path also limits work: shots trigger explanations, with one request in flight, a default 30-second cooldown and at most 12 requests per replay connection. Its labeled local template mode makes no model calls. These controls apply to that explanation path, not to chat; neither is a global spending cap.
+
+For an Azure pilot, [Container Apps Consumption supports scale-to-zero](https://learn.microsoft.com/azure/container-apps/plans), which could reduce idle compute usage. A live match service still needs a deliberate availability policy, shared state, and tested streaming/recovery behavior. Consumption hosting does not make model inference, data licensing or all supporting services free. No operating-cost benchmark or guaranteed free-tier availability is claimed.
+
+## Run locally
+
+Requires **Python 3.14**, **Pipenv**, and internet access to retrieve historical fixtures/events. Cloud credentials are optional for the core viewing experience.
 
 ```bash
 PIPENV_VENV_IN_PROJECT=1 pipenv sync --dev
@@ -14,18 +119,90 @@ cp .env.example .env
 pipenv run dev
 ```
 
-The development command opens http://127.0.0.1:8000/overlay in your default browser once the server is
-ready. Code changes still reload automatically without opening extra tabs.
-Open http://127.0.0.1:8000/docs for the API documentation.
-`GET /health` returns `{"status":"ok"}`. No cloud account or API key is needed.
+If `.env` already exists, retain it and add only the settings you need. The development command opens the overlay once the server is ready and reloads code changes.
 
-Open **http://127.0.0.1:8000/** for **Touchline**, the live matchroom. Select a
-StatsBomb Premier League match and start replay to see the event pitch, score/clock, shot map,
-momentum timeline, and evidence-linked insights. All assets are served locally;
-optional Google Fonts fall back to system fonts when offline. The browser frontend
-uses plain JavaScript/SVG and needs no Node package manager or build step.
+| Address | Purpose |
+| --- | --- |
+| [localhost:8000/overlay](http://127.0.0.1:8000/overlay) | Broadcast-style viewing experience; choose a fixture and press **Start replay**. |
+| [localhost:8000/](http://127.0.0.1:8000/) | Main matchroom. |
+| [localhost:8000/docs](http://127.0.0.1:8000/docs) | Interactive API documentation. |
+| [localhost:8000/health](http://127.0.0.1:8000/health) | Health check: `{"status":"ok"}`. |
 
-See the [demo guide](docs/demo.md) for the viewing modes and presentation sequence.
+The standard overlay offers real time and 2× playback. The recorded case study adds a 60× choice for presentation; the API also accepts accelerated replay directly.
+
+### Enable AI questions
+
+Add a server-side Gemini key to `.env`, then restart the application:
+
+```dotenv
+GAME_GEMINI_API_KEY=YOUR_KEY
+GAME_GEMINI_MODEL=YOUR_AVAILABLE_GEMINI_MODEL
+```
+
+Select a model your account can access. The code's default is recorded in [.env.example](.env.example); availability and quota depend on the provider/account. Never commit `.env` or put a model key in browser code.
+
+### Enable optional Foundry insights
+
+Use a deployment supporting chat completions with strict JSON-schema outputs:
+
+```dotenv
+GAME_EXPLANATION_PROVIDER=foundry
+GAME_FOUNDRY_ENDPOINT=https://YOUR-RESOURCE.openai.azure.com
+GAME_FOUNDRY_DEPLOYMENT=YOUR-DEPLOYMENT-NAME
+GAME_FOUNDRY_API_KEY=YOUR_KEY
+```
+
+Use the HTTPS resource root, not a project URL or `/models` path. A Foundry `https://RESOURCE.services.ai.azure.com` resource root is also supported. After restarting, run the explicit smoke check only when ready to make a potentially billable request:
+
+```bash
+pipenv run python -m app.check_foundry
+```
+
+A successful real response exits with code 0 and reports `provider=microsoft_foundry`; a labeled fallback exits with code 1. Without Foundry, retain `GAME_EXPLANATION_PROVIDER=template`, or use `off` to disable this explanation path.
+
+## API and replay behavior
+
+| Endpoint | Purpose |
+| --- | --- |
+| `GET /matches` | Available StatsBomb Premier League 2015/16 fixtures, omitting final scores. |
+| `GET /matches/{match_id}/stream` | SSE replay: `match`, incremental `update`, optional `insight`, then `complete`. |
+| `POST /chat` | A question, `simple`/`analyst` mode and bounded replay snapshot; returns an answer or explicit provider error. |
+| `GET /health` | Application health. |
+
+```bash
+# One match minute per wall-clock second; no LLM inference.
+curl -N 'http://127.0.0.1:8000/matches/3754217/stream?speed=60'
+
+# Optional shot-triggered templates or Foundry output, depending on configuration.
+curl -N 'http://127.0.0.1:8000/matches/3754217/stream?speed=60&insights=true&audience=analyst'
+```
+
+Replay connections have independent state. Disconnecting cancels replay; reconnecting starts again from kick-off. Resume, shared server sessions and production broadcast-clock synchronization are not implemented. The in-browser BroadcastChannel supports same-browser tabs, not independent OBS browser sources or viewers on another device.
+
+StatsBomb xG is supplied by the dataset. xT uses the public pretrained 12×8 grid described in [the model notes](docs/xt-model.md), without fitting on the replayed match. Momentum measures signed per-action progression, not defensive value or scoring probability. Shot-map display places home attacks toward the right and away attacks toward the left; shot snapshots use their own period-specific direction convention. Missing coordinates/snapshots are not inferred as tracking data.
+
+## Hackathon alignment and remaining work
+
+The project follows the challenge's ingest → interpret → explain → render → personalize pipeline. The five judging areas below carry equal 20% weights. The [official rules](https://github.com/microsoft/insidethegamehackathon/blob/main/OFFICIAL%20RULES.md) are the authority; the event's Innovation Studio page required sign-in when checked on October 21, 2026.
+
+| Judging area | Evidence and remaining work |
+| --- | --- |
+| Technological implementation | Incremental replay/analytics and reproducible setup; richer synthetic-data generation and validation remain. |
+| Agentic design and innovation | A working evidence-to-narration workflow with three tools; broader evaluation is still needed. |
+| Real-world impact | A broadcast/streaming presentation concept; shared sessions, licensed live feeds and synchronization remain. |
+| User experience and presentation | Working overlay, interactive questions and a narrated case study; expanded audience/language modes remain. |
+| Category adherence | Match category claims to demonstrated functionality; planned Foundry/Azure services are not evidence of deployment. |
+
+**Synthetic-data work:** [app/synthetic.py](app/synthetic.py) generates seeded fictional events. A separate [synthetic demo build](tools/demo/README.md) runs that source through the same analytics and overlay. It is separate from the public application's historical fixture selector. Its heuristic xG is illustrative and football realism still needs evaluation and broader event coverage.
+
+Before submission:
+
+- Validate football-realistic synthetic data and demonstrate it in a judge-accessible build.
+- Confirm category fit, registration, eligibility and third-party permissions.
+- Publish the GitHub repository and an English demo **under two minutes** on an accepted public video host.
+- Supply reproducible test instructions and keep the build accessible through judging.
+
+## Development and project map
 
 ```bash
 pipenv run test
@@ -33,231 +210,21 @@ pipenv run lint
 pipenv run format --check
 ```
 
-Commit both `Pipfile` and `Pipfile.lock`. Install reproducibly with `pipenv sync`;
-use `pipenv install PACKAGE` or `pipenv install --dev PACKAGE` to add dependencies.
-The lock file pins resolved versions and hashes. `.venv`, `.env`, and downloaded
-data stay out of version control.
+Dependencies are managed with Pipenv; commit `Pipfile` and `Pipfile.lock`. For dependency changes, use `pipenv install` or `pipenv install --dev` and retain the lock file. Demo video tooling is separate from application runtime dependencies.
 
-## Current scope
+| Path | Responsibility |
+| --- | --- |
+| [app/main.py](app/main.py) | FastAPI routes and application wiring. |
+| [app/source.py](app/source.py), [app/replay.py](app/replay.py) | Historical data ingestion and ordered streaming. |
+| [app/analytics.py](app/analytics.py), [app/passing.py](app/passing.py) | Incremental match calculations and passing networks. |
+| [app/chat_workflow.py](app/chat_workflow.py), [app/chat.py](app/chat.py) | Agent Framework orchestration, Gemini inference and citation checks. |
+| [app/explanations.py](app/explanations.py) | Optional template/Foundry shot explanations. |
+| [app/static/](app/static/) | Overlay, matchroom, charts and chat interface. |
+| [tests/](tests/) | Replay, analytics, source, workflow and provider tests. |
+| [tools/demo/](tools/demo/) | Reproducible recording, narration and export scripts. |
 
-Match selection, historical event replay, and incremental momentum and shot-map
-data are implemented. Optional Microsoft Foundry explanations and a labeled local
-template mode are implemented. Foundry has not yet been verified against a real
-deployment. The responsive viewing interface uses StatsBomb exclusively. Synthetic match
-selection has been removed; the seeded generator remains an internal test utility.
+## Data, assets and license
 
-## Optional match explanations
+The [repository license](LICENSE) covers this project's code. Third-party data, model grids, club crests, stadium photographs and logos retain their own terms. StatsBomb attribution and logo are displayed in the app; publicly available data is not blanket permission to redistribute or commercially exploit it.
 
-Explanations are opt-in per stream:
-
-```bash
-curl -N 'http://127.0.0.1:8000/matches/3754217/stream?speed=60&insights=true&audience=analyst'
-```
-
-Choose `audience=casual` (default) or `analyst`. In the default configuration,
-`insight` SSE messages are deterministic English templates labeled
-`provider=template` and `ai_generated=false`; they make no model calls.
-
-To enable real inference, copy `.env.example` to `.env` and configure:
-
-```dotenv
-GAME_EXPLANATION_PROVIDER=foundry
-GAME_FOUNDRY_ENDPOINT=https://YOUR-RESOURCE.openai.azure.com
-GAME_FOUNDRY_DEPLOYMENT=YOUR-DEPLOYMENT-NAME
-GAME_FOUNDRY_API_KEY=YOUR-KEY
-```
-
-Use an Azure OpenAI deployment in Microsoft Foundry that supports chat completions
-with strict JSON-schema structured outputs. The endpoint is the HTTPS resource
-root (also supported: your Foundry resource's `https://RESOURCE.services.ai.azure.com`
-root), not a project URL, `/models`, or `/openai/v1` URL. The provider calls
-`/openai/v1/chat/completions` using the server-side API key. The deployment name
-is your Azure deployment identifier. Restart the API after configuration changes.
-No extra dependencies are needed: the integration uses the existing HTTPX client.
-
-Run one **potentially billable** smoke request with fictional facts:
-
-```bash
-pipenv run python -m app.check_foundry
-```
-
-Exit code 0 and `provider=microsoft_foundry` indicate a real successful response.
-A labeled fallback exits with code 1. No live Foundry verification has been run
-as part of development so far; mocked HTTP tests are not evidence of Azure access.
-
-Insights trigger on shots only. By default, each connection allows at most 12
-requests with at least 30 wall-clock seconds between request starts and one
-request in flight. Shots arriving while busy are skipped for explanations;
-analytics still process every event. Faster replays therefore produce fewer
-insights. These are per-connection limits, not a subscription-wide spending cap.
-Requests time out after 10 seconds and are not retried. Settings are in `.env.example`.
-
-Model input contains only the triggering event's analytics snapshot and team names,
-not the full historical fixture. Output is schema-validated, and cited event IDs
-must match the triggering shot. Model prose can still be inaccurate; this is not
-a factual-proof system. Render text as plain text. Model failure, refusal,
-truncation, invalid output, and timeout fall back to a clearly labeled template.
-
-`insight` messages include `as_of_event_id`, evidence IDs, audience, provider,
-`ai_generated`, and a sanitized `fallback_reason`. They can arrive after newer
-events; anchor them to `as_of_event_id`, not the latest chart state. Streaming
-continues during inference. Completion waits for the bounded pending request;
-disconnecting cancels it locally (this does not guarantee Azure stops billing).
-Set `GAME_EXPLANATION_PROVIDER=off` to disable explanations globally.
-
-## Match replay and analytics
-
-`GET /matches` fetches available Premier League 2015/2016 fixtures directly from
-StatsBomb (competition 2, season 27), omitting final scores.
-
-The app and public API use StatsBomb exclusively, with no source selector.
-A network connection is required to fetch fixtures and events. Club crests are
-served from local Wikipedia-sourced assets, and the official StatsBomb logo is
-shown with linked attribution. Asset origins are recorded in
-[the asset credits](docs/assets.md). Score updates use emitted goals/own goals only.
-
-```bash
-curl -N 'http://127.0.0.1:8000/matches/3754217/stream?speed=60'
-```
-
-The SSE endpoint emits `match`, `update`, then `complete` messages. Each
-`update` includes the current event, momentum, a `shot_added` delta (null for
-non-shot events), and cumulative shot/xG totals by team ID. A client builds its
-shot map by appending each non-null `shot_added`; event IDs support deduplication.
-Browser clients can use `EventSource` and close it on `complete` or `error` to
-avoid automatic replay restarts. Reconnecting starts a fresh replay; resume is
-not implemented. Each connection has independent state.
-
-Replay defaults to real-time event spacing; `speed=60` compresses one match minute
-to one second. Allowed speeds are 0.1–1000. Period breaks are skipped, timestamps
-reset per period, and stoppage time is retained. Disconnecting stops the replay.
-Data is downloaded into server memory before streaming and is not cached on disk.
-This is simulated live historical data, not a live feed or synthetic dataset.
-
-**Momentum:** computed xT for completed open-play passes/crosses and recorded
-carries. Each movement receives end-cell minus start-cell value from Karun
-Singh's public pretrained 12×8 grid, recommended by socceraction's `load_model`.
-Each mark shows one action’s signed xT change, without accumulation or time decay.
-The chart plots home minus away per action; shootouts are excluded.
-The vertical scale adapts to observed values. Football markers identify
-shots at their event timestamps, sized by xG. Shots, failed passes and restarts do
-not add xT. This measures attacking progression, not defensive value or win probability.
-
-Payload: `metric=xt`, model identifier, `aggregation=per_action`, current `action_value` (null for unvalued actions), home/away
-action values, `net_difference`, `period_observations` and `missing_movements`
-(number of teams with missing movement coordinates). Missing coordinates mark that
-team and the comparison null (`status=incomplete`) until the next period reset;
-otherwise status is `available`. `source_values_seen` counts computed movements.
-
-See [xT model provenance and limitations](docs/xt-model.md). This is a lightweight
-implementation of socceraction's non-interpolated inference rule, using a direct
-StatsBomb adapter; socceraction itself is not installed (its published Python
-constraint excludes this project's Python 3.14). No models are fitted on replayed
-matches and no future match events are used for inference. The public grid's
-training corpus is not verified here, so no claim of an independent historical
-backtest or Premier League calibration is made.
-
-**Shot map:** the API retains StatsBomb's 120 × 80 coordinates, where both teams
-attack toward increasing x. The frontend uses opposing directions: home attacks
-right in the first half and left in the second; away does the reverse. This is a
-display convention, not a recovered stadium/camera orientation. Rotate leftward
-actions by 180°: `(x, y) → (120 − x, 80 − y)`; shot height stays unchanged.
-Apply the same transform to all freeze-frame players and the shot endpoint using
-the shooting team's direction, including opponents and goalkeepers.
-
-**Follow match** shows the current half and changes ends at halftime. The period
-selector also supports either half and the whole match. Displayed shot/xG totals
-follow that period selection; team filters affect markers only. Whole-match mode
-retains each shot's period-specific position, so each team can have shots at both
-ends. Replay score and momentum remain match-based. Direction labels identify the
-current view, and shot snapshot captions identify their own period/direction.
-Each marker includes player, event ID, match minute/second, period, outcome,
-body part, type, and supplied StatsBomb xG (not an independently trained model).
-A missing location remains null and cannot be plotted; the shot still counts.
-Shootout shots are marked separately and excluded from momentum and match totals.
-Only shots already emitted appear in the state. No final score is sent.
-
-**Shot snapshots:** each shot delta also includes `freeze_frame` (an empty list
-when unavailable) and the recorded shot `end_location`. Freeze-frame entries
-contain recorded player coordinates, identity, position, a `teammate` flag relative
-to the shooter, and a derived `goalkeeper` flag. These are shot-time snapshots,
-not StatsBomb 360 or continuous tracking, and may not include every player.
-
-The shot snapshot pitch follows newly emitted shots. Selecting a shot marker or
-its commentary link pins that snapshot while replay continues; **Follow latest
-shot** returns to automatic updates. Shooter rings and goalkeeper squares distinguish
-roles; player names appear on hover or keyboard focus. If no frame is available,
-the panel clears the previous positions and displays an unavailable message.
-Freeze-frame coordinates are omitted from model prompts; narrative context remains
-the measured shot/momentum summary.
-
-Planned flow: event source → replay clock → incremental match state → grounded
-explanations → personalized fan experience. The replay clock should support
-speed control, period boundaries, cancellation, and independent viewer sessions.
-Only events already emitted may enter match state or AI context; final scores
-and future events must not leak into a replay.
-
-## Data and hackathon requirements
-
-See the [Microsoft integration and deployment plan](docs/microsoft-deployment.md)
-for component-to-service mapping, current implementation status, and work needed
-before Azure deployment. Development remains local; no Azure resources or paid
-model calls are enabled. Planned deployment is not evidence of actual platform use.
-
-See [the project brief](docs/project-brief.md) for the source policy, proposed
-architecture, submission checklist, and feature ideas. Historical StatsBomb
-replay alone does not satisfy the requirement to use synthetic data. The optional
-Foundry adapter must be exercised against a real deployment before claiming
-verified Microsoft AI usage in the submission.
-
-The repository's existing LICENSE covers our code, not third-party datasets.
-
-### Live broadcast overlay
-
-Open **http://127.0.0.1:8000/overlay** for the TV-style view. Choose a match and
-press **Start replay** using the replay controls on that page; controls collapse
-when playback starts and can be reopened at any time. Real time and 2× speeds
-are available. The overlay can also join a replay already running in another tab
-in the same browser. Starting its own replay makes it independent of other tabs.
-
-The home stadium appears at low opacity on a light background, with a compact scoreline and all live
-components visible together: momentum, shot map, top stats, passing
-network and match notes. The broadcast canvas scales to the window without
-scrollbars or navigation. Use a landscape display for readable text. Replay
-controls collapse on playback and can be reopened. The original progression
-momentum remains selectable, and the passing network retains its team selector.
-
-Stadium backgrounds use Wikipedia’s freely licensed page images with photographer
-and license credit linking to the original file. Grounds match the 2015/16 replay
-season. If Wikipedia or Wikimedia is unavailable, a neutral background is used.
-
-### Ask about the match so far (Microsoft Agent Framework + Gemini)
-
-Set `GAME_GEMINI_API_KEY` in your local `.env` and restart `pipenv run dev`.
-The overlay’s **Ask about the match so far.** panel supports suggested questions
-and free text, with answers written for casual fans. Only user questions trigger model requests.
-`GAME_GEMINI_MODEL` defaults to `gemini-3.8-flash`; select a model your account
-can access. Keep the API key on the server and out of source control.
-
-Microsoft Agent Framework runs a two-stage workflow locally: an evidence executor
-invokes `get_match_stats`, `get_recent_events`, and `get_player_summary`; a narration
-executor sends that evidence to Gemini and validates the answer’s event citations.
-Tool selection is deterministic, not model-directed. Each question runs in isolation
-and normally makes one LLM request. This is Microsoft orchestration with Google’s
-Gemini model, not a Microsoft-hosted model. Agent Framework needs no Azure account
-or credit card; Gemini API quotas and account requirements still apply.
-
-Each question captures the score, match-to-date statistics, passing networks and
-the latest 60 recorded events at the current replay clock. Gemini is instructed
-to answer only from this context; event references are checked against the
-supplied excerpt. It receives no future match events or final-result fields.
-Player passing summaries cover the current network window, which resets after
-substitutions or sending-offs; they are not full-match player totals.
-This is context grounding and citation validation, not a guarantee that every
-generated statement is correct. The backend trusts the local viewing client's
-snapshot; a public multi-user deployment should use authoritative server sessions.
-
-Answers show their snapshot time and evidence when available. Resetting cancels
-pending answers. Provider failures and quota limits are shown explicitly; no
-canned response is passed off as AI output. Free-tier availability depends on
-the Gemini account and model.
+See [asset credits](docs/assets.md), [asset provenance](app/static/assets/sources.json), the [xT model notes](docs/xt-model.md), and [StatsBomb's data license](https://github.com/hudl/open-data/blob/master/LICENSE.pdf). An event-data pitch avoids using broadcast video; it does not remove the need to verify rights to the data and assets used.
