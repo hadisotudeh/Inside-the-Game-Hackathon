@@ -56,7 +56,11 @@ def test_viewing_routes_use_statsbomb_only():
         assert "Touchline — Match analysis" in html
         assert 'id="source"' not in html
         assert 'alt="StatsBomb"' in html
-        assert "overlay-score" in client.get("/overlay").text
+        overlay = client.get("/overlay")
+        assert overlay.status_code == 200
+        assert 'data-overlay="true"' in overlay.text
+        assert 'id="homeScore"' in overlay.text
+        assert 'id="awayScore"' in overlay.text
         assert client.get("/static/app.js").status_code == 200
         fixtures = client.get("/matches").json()
         assert fixtures[0]["home_team"]["name"] == "Chelsea"
