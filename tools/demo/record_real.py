@@ -7,9 +7,8 @@ import os
 import time
 from pathlib import Path
 
-from title_card import microsoft_card, opening_card
-
 from playwright.async_api import async_playwright
+from title_card import microsoft_card, opening_card
 
 OUT = Path(os.environ.get("TOUCHLINE_DEMO_OUT", "artifacts/demo-real"))
 CSS = (
@@ -66,7 +65,10 @@ async def main():
             document.querySelector('.broadcast-live-badge').textContent='HISTORICAL REPLAY · 60×';
             document.body.insertAdjacentHTML('beforeend',`<div id="editorial">TOUCHLINE / THE STORY BEHIND THE SCORE</div><div id="case-study"><span>CHELSEA v ARSENAL · 2015/16 CASE STUDY</span><img src="/static/assets/statsbomb.png" alt="StatsBomb"></div>`);
         }""")
-        await page.evaluate("html => document.body.insertAdjacentHTML('beforeend', html)", opening_card(historical=True))
+        await page.evaluate(
+            "html => document.body.insertAdjacentHTML('beforeend', html)",
+            opening_card(historical=True),
+        )
         video = page.video
         started = time.monotonic()
         clock_samples = []
@@ -129,7 +131,9 @@ async def main():
             el.style.opacity='1';
         }""")
         if os.environ.get("TOUCHLINE_DEMO_MICROSOFT") == "1":
-            await page.locator("#title-card").evaluate("(el, html) => {el.innerHTML = html; el.style.opacity = '1';}", microsoft_card())
+            await page.locator("#title-card").evaluate(
+                "(el, html) => {el.innerHTML = html; el.style.opacity = '1';}", microsoft_card()
+            )
         await at(total)
         (OUT / "recording-report.json").write_text(
             json.dumps(

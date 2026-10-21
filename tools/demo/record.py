@@ -6,9 +6,8 @@ import json
 import time
 from pathlib import Path
 
-from title_card import opening_card
-
 from playwright.async_api import async_playwright
+from title_card import opening_card
 
 OUT = Path("artifacts/demo")
 CSS = Path("tools/demo/editorial.css").read_text()
@@ -47,7 +46,10 @@ async def main():
           document.querySelector('.broadcast-controls').open=false;
           document.body.insertAdjacentHTML('beforeend',`<div id="editorial">TOUCHLINE / FOOTBALL INTELLIGENCE</div><div id="cut-count">LOCAL PROTOTYPE</div>`);
         }""")
-        await page.evaluate("html => document.body.insertAdjacentHTML('beforeend', html)", opening_card(historical=False))
+        await page.evaluate(
+            "html => document.body.insertAdjacentHTML('beforeend', html)",
+            opening_card(historical=False),
+        )
         # Video includes setup frames, measured below and removed during export.
         video = page.video
         setup = await page.evaluate("performance.now()")
