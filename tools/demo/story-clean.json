@@ -1,0 +1,34 @@
+[
+  {
+    "label": "THE STORY BEHIND THE SCORE",
+    "text": "You can see the score. But who's really creating the danger? That's where Touchline comes in."
+  },
+  {
+    "label": "DESIGNED FOR LIVE TV AND STREAMING",
+    "text": "It's designed to sit alongside live TV footage. To avoid redistributing copyrighted broadcast video, we've replaced that footage with a pitch that visualizes the event data."
+  },
+  {
+    "label": "WHAT IS FOOTBALL EVENT DATA?",
+    "text": "Event data records individual actions: who passed, where a shot was taken, and the outcome, each with a timestamp. In a live Premier League setup, events would arrive through a licensed provider's API. Here, we're using a historical, publicly available Premier League match from StatsBomb as our case study."
+  },
+  {
+    "label": "HISTORICAL MATCH \u00b7 ONE EVENT AT A TIME",
+    "text": "The app streams events one at a time, in match order. Watch the clock, pitch and statistics update as each action arrives. We've accelerated the replay for this demo."
+  },
+  {
+    "label": "SEE WHERE THE DANGER COMES FROM",
+    "text": "The shot map shows where chances came from and their expected goals. Larger markers mean better chances; filled markers are goals. Select a shot to inspect its player, outcome and chance quality. Momentum highlights attacking progression. And the passing network shows the connections between players. Switch teams to explore both sides."
+  },
+  {
+    "label": "ASK ABOUT THE MATCH SO FAR",
+    "text": "Or just ask: who's created the better chances so far? Microsoft Agent Framework gathers the match evidence, then Gemini turns that snapshot into a plain-English answer."
+  },
+  {
+    "label": "EVIDENCE AT THE REPLAY CLOCK",
+    "text": "Each question captures the match at the replay clock, without future events or the final result. The answer shows its snapshot time as play continues, so you can see which moment the explanation refers to."
+  },
+  {
+    "label": "TOUCHLINE / UNDERSTAND THE STORY",
+    "text": "That's Touchline. Bringing the story behind the numbers onto the screen, while the match unfolds."
+  }
+]

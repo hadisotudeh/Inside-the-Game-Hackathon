@@ -1,0 +1,91 @@
+1
+00:00:00,400 --> 00:00:02,521
+You can see the score.
+
+2
+00:00:02,531 --> 00:00:05,263
+But who's really creating the danger?
+
+3
+00:00:05,273 --> 00:00:07,799
+That's where Touchline comes in.
+
+4
+00:00:08,562 --> 00:00:12,303
+It's designed to sit alongside live TV footage.
+
+5
+00:00:12,313 --> 00:00:19,813
+To avoid redistributing copyrighted broadcast video, we've replaced that footage with a pitch that visualizes the event data.
+
+6
+00:00:20,564 --> 00:00:28,310
+Event data records individual actions: who passed, where a shot was taken, and the outcome, each with a timestamp.
+
+7
+00:00:28,320 --> 00:00:33,693
+In a live Premier League setup, events would arrive through a licensed provider's API.
+
+8
+00:00:33,703 --> 00:00:40,297
+Here, we're using a historical, publicly available Premier League match from StatsBomb as our case study.
+
+9
+00:00:41,062 --> 00:00:45,058
+The app streams events one at a time, in match order.
+
+10
+00:00:45,068 --> 00:00:49,905
+Watch the clock, pitch and statistics update as each action arrives.
+
+11
+00:00:49,915 --> 00:00:53,142
+We've accelerated the replay for this demo.
+
+12
+00:00:53,904 --> 00:00:58,423
+The shot map shows where chances came from and their expected goals.
+
+13
+00:00:58,433 --> 00:01:02,913
+Larger markers mean better chances; filled markers are goals.
+
+14
+00:01:02,923 --> 00:01:07,530
+Select a shot to inspect its player, outcome and chance quality.
+
+15
+00:01:07,540 --> 00:01:10,591
+Momentum highlights attacking progression.
+
+16
+00:01:10,601 --> 00:01:14,686
+And the passing network shows the connections between players.
+
+17
+00:01:14,696 --> 00:01:17,795
+Switch teams to explore both sides.
+
+18
+00:01:18,554 --> 00:01:22,729
+Or just ask: who's created the better chances so far?
+
+19
+00:01:22,739 --> 00:01:29,792
+Microsoft Agent Framework gathers the match evidence, then Gemini turns that snapshot into a plain-English answer.
+
+20
+00:01:30,556 --> 00:01:36,567
+Each question captures the match at the replay clock, without future events or the final result.
+
+21
+00:01:36,577 --> 00:01:43,491
+The answer shows its snapshot time as play continues, so you can see which moment the explanation refers to.
+
+22
+00:01:44,262 --> 00:01:46,090
+That's Touchline.
+
+23
+00:01:46,100 --> 00:01:51,061
+Bringing the story behind the numbers onto the screen, while the match unfolds.

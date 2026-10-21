@@ -237,6 +237,10 @@ __marimo__/
 Thumbs.db
 .vscode
 
-# Generated demo recordings and audio (keep scripts and captions in Git)
-/artifacts/
-tools/
+# Keep demo tools, scripts and assets available for README links and reproduction.
+# Ignore generated demo output, but retain package documentation and captions.
+/artifacts/*
+!/artifacts/*/
+/artifacts/*/*
+!/artifacts/*/README.md
+!/artifacts/*/*.srt
