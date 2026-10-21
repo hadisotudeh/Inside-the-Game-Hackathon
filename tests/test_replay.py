@@ -32,7 +32,7 @@ def test_incremental_shots_duplicates_and_period_reset():
     assert first["momentum"]["net_difference"] == 0
     assert state.consume(event("1"))["shot_added"] is None
     state.consume(event("2", kind="Carry", carry={"end_location": [115, 40]}))
-    assert state.consume(event("3", second=30, kind="Pressure"))["momentum"]["home"] > 0
+    assert state.consume(event("3", second=30, kind="Pressure"))["momentum"]["home"] == 0
     reset = state.consume(event("4", period=2, kind="Half Start"))
     assert reset["momentum"]["home"] == 0
     assert reset["shot_summary"]["1"]["shots"] == 1
@@ -78,7 +78,7 @@ def test_shot_snapshots_preserve_recorded_players_and_handle_missing_frames():
     assert state.consume(event("3", kind="Pass"))["shot_added"] is None
 
 
-def test_xt_signed_decay_and_missing_coordinates():
+def test_xt_signed_actions_and_missing_coordinates():
     state = MatchAnalytics(1, 2)
     move = event("1", kind="Carry", carry={"end_location": [115, 40]})
     result = state.consume(move)
@@ -88,9 +88,9 @@ def test_xt_signed_decay_and_missing_coordinates():
         event("2", team=2, kind="Carry", location=[115, 40], carry={"end_location": [100, 40]})
     )
     assert result["momentum"]["away"] == pytest.approx(-0.1494026)
-    assert result["momentum"]["net_difference"] == pytest.approx(0.2988052)
+    assert result["momentum"]["net_difference"] == pytest.approx(0.1494026)
     result = state.consume(event("3", timestamp="00:01:00.000", kind="Pressure"))
-    assert result["momentum"]["net_difference"] == pytest.approx(0.2988052 / 16)
+    assert result["momentum"]["net_difference"] == 0
     result = state.consume(event("4", kind="Carry", timestamp="00:01:01.000"))
     assert result["momentum"]["status"] == "incomplete"
     assert result["momentum"]["home"] is None
@@ -172,14 +172,14 @@ def test_disconnected_replay_stops_before_processing():
     assert len(messages) == 1
 
 
-def test_smoothing_halves_every_15_match_seconds_without_new_actions():
+def test_per_action_momentum_does_not_accumulate_or_decay():
     state = MatchAnalytics(1, 2)
     first = state.consume(event("1", kind="Carry", carry={"end_location": [115, 40]}))
     value = first["momentum"]["home"]
-    for identifier, second, divisor in (("2", 15, 2), ("3", 30, 4), ("4", 45, 8)):
+    for identifier, second, _ in (("2", 15, 2), ("3", 30, 4), ("4", 45, 8)):
         result = state.consume(event(identifier, second=second, kind="Pressure"))
-        assert result["momentum"]["home"] == pytest.approx(value / divisor)
+        assert result["momentum"]["home"] == 0
         assert result["momentum"]["action_value"] is None
-    assert first["momentum"]["aggregation"] == "exponential_decay_sum"
-    assert first["momentum"]["half_life_seconds"] == 15
+    assert first["momentum"]["aggregation"] == "per_action"
+    assert "half_life_seconds" not in first["momentum"]
     assert first["momentum"]["action_value"] == pytest.approx(value)

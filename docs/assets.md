@@ -25,3 +25,15 @@ StatsBomb logo remain third-party marks and are not covered by this repository's
 code license. Wikipedia availability does not establish a blanket redistribution
 license; consult the corresponding image description and rights information for
 the intended publication.
+
+## Stadium backgrounds
+
+`app/static/assets/stadiums.json` maps all supported clubs to their 2015/16 home
+grounds, checked against the [season stadium table](https://en.wikipedia.org/wiki/2015%E2%80%9316_Premier_League#Stadiums_and_locations).
+`app/static/stadium.js` requests freely licensed stadium page images using the
+[PageImages API](https://www.mediawiki.org/wiki/API:Pageimages) and retrieves
+author/license metadata via [Imageinfo](https://www.mediawiki.org/wiki/API:Imageinfo).
+Photographer and license are displayed beneath the overlay, linked to the file
+description. Photos are loaded remotely, not bundled; a dark gradient is applied
+over the original image for readability. Photo date is not guaranteed to match
+the replay season. A neutral background is used if lookup or loading fails.

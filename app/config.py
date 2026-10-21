@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="GAME_", env_file=".env", extra="ignore")
 
     app_name: str = "Inside the Game"
+    gemini_api_key: SecretStr = SecretStr("")
+    gemini_model: str = "gemini-3.8-flash"
     explanation_provider: Literal["off", "template", "foundry"] = "template"
     foundry_endpoint: str = ""
     foundry_deployment: str = ""

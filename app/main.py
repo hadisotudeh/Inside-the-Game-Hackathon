@@ -8,6 +8,7 @@ from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
+from app.chat import ChatRequest, MatchChat
 from app.config import Settings
 from app.explanations import Audience, ExplanationProvider
 from app.replay import replay
@@ -18,6 +19,7 @@ def create_app() -> FastAPI:
     settings = Settings()
     application = FastAPI(title=settings.app_name, version="0.1.0")
     application.state.source = StatsBombSource()
+    application.state.chat = MatchChat(settings)
     application.state.explanations = ExplanationProvider(settings)
     static = Path(__file__).parent / "static"
     application.mount("/static", StaticFiles(directory=static), name="static")
@@ -29,6 +31,10 @@ def create_app() -> FastAPI:
     @application.get("/overlay", include_in_schema=False)
     async def overlay():
         return FileResponse(static / "overlay.html")
+
+    @application.post("/chat", tags=["match intelligence"])
+    async def chat(payload: ChatRequest):
+        return await application.state.chat.ask(payload)
 
     async def load(awaitable):
         try:

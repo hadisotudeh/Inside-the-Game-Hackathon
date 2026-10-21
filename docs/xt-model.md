@@ -30,13 +30,30 @@ Use this as a fan-facing attacking progression indicator, not a validated
 historical prediction, VAEP, or proprietary StatsBomb OBV. It ignores defenders,
 game state, failed movement costs and defensive contributions.
 
-For each team the smoother follows S(t) = S(previous) × 2^(−elapsed/15) + action_xT.
-Elapsed time is match time, independent of replay speed. There is no hard window
-cutoff, future-event lookahead, or normalization by action count. Period changes
-reset the state; duplicate events never add value twice. Missing movement coordinates
-mark the affected team's state incomplete until the next period reset.
+Momentum now shows individual action xT changes, with no accumulation or time decay.
+For each event, the acting team receives action_xT and the other team receives zero.
+The chart plots home minus away as one vertical mark per nonzero action. Positive
+values use the home color; negative values use the away color. A backward movement
+can favor the opponent. Non-rated events contribute zero; missing movement
+coordinates make only that action incomplete. Duplicate events never count twice.
+Shots remain separate markers sized by xG.
 
-The UI plots home minus away at every event and traces exponential decay between
-events, without time buckets. Shots are football markers sized by xG and can be
-selected for inspection. This smoothing and visualization are app choices, not a
-socceraction momentum model.
+## Experimental peak-threat comparison
+
+The app uses only per-action progression. The experimental model
+is retained in `app/peak_momentum.py` as an inactive backup; it is neither computed
+nor streamed during replay, and there is no calculation selector.
+
+`app/peak_momentum.py` records the maximum destination-cell xT of completed
+open-play passes/carries, or starting-cell xT of shots, per team per period-minute.
+Each maximum is capped to [0, 0.1]. The current and previous three minute buckets
+are averaged with weights `2 ** (-(period_seconds - bucket_start) / 60)`.
+Quiet minutes contribute zero; the partial current minute contains only observed
+events. State resets each period, and shootouts contribute no threat. Missing
+locations are skipped. The chart connects event-time samples linearly.
+
+This borrows the capped-minute-peak and recency-weighting structure described by
+[Opta Analyst](https://theanalyst.com/articles/what-is-match-momentum), but uses
+location xT rather than their proprietary next-10-seconds possession-value model.
+The four-minute window and 60-second half-life are our choices, not published
+Opta weights. Values must not be read as scoring probabilities.

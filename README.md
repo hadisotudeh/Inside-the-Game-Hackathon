@@ -14,6 +14,8 @@ cp .env.example .env
 pipenv run dev
 ```
 
+The development command opens http://127.0.0.1:8000/overlay in your default browser once the server is
+ready. Code changes still reload automatically without opening extra tabs.
 Open http://127.0.0.1:8000/docs for the API documentation.
 `GET /health` returns `{"status":"ok"}`. No cloud account or API key is needed.
 
@@ -135,17 +137,14 @@ This is simulated live historical data, not a live feed or synthetic dataset.
 **Momentum:** computed xT for completed open-play passes/crosses and recorded
 carries. Each movement receives end-cell minus start-cell value from Karun
 Singh's public pretrained 12×8 grid, recommended by socceraction's `load_model`.
-Each action adds its signed value to its team's exponentially decaying total.
-Influence halves every 15 seconds of match time; there is no hard cutoff. Period
-changes reset the totals and shootouts are excluded. The chart plots home minus
-away at each event and traces exponential decay between events, without 30-second
-bucketing. The vertical scale adapts to observed values. Football markers identify
+Each mark shows one action’s signed xT change, without accumulation or time decay.
+The chart plots home minus away per action; shootouts are excluded.
+The vertical scale adapts to observed values. Football markers identify
 shots at their event timestamps, sized by xG. Shots, failed passes and restarts do
 not add xT. This measures attacking progression, not defensive value or win probability.
 
-Payload: `metric=xt`, model identifier, `aggregation=exponential_decay_sum`,
-`half_life_seconds=15`, current `action_value` (null for unvalued actions), home/away
-smoothed totals, `net_difference`, `period_observations` and `missing_movements`
+Payload: `metric=xt`, model identifier, `aggregation=per_action`, current `action_value` (null for unvalued actions), home/away
+action values, `net_difference`, `period_observations` and `missing_movements`
 (number of teams with missing movement coordinates). Missing coordinates mark that
 team and the comparison null (`status=incomplete`) until the next period reset;
 otherwise status is `available`. `source_values_seen` counts computed movements.
@@ -212,3 +211,53 @@ Foundry adapter must be exercised against a real deployment before claiming
 verified Microsoft AI usage in the submission.
 
 The repository's existing LICENSE covers our code, not third-party datasets.
+
+### Live broadcast overlay
+
+Open **http://127.0.0.1:8000/overlay** for the TV-style view. Choose a match and
+press **Start replay** using the replay controls on that page; controls collapse
+when playback starts and can be reopened at any time. Real time and 2× speeds
+are available. The overlay can also join a replay already running in another tab
+in the same browser. Starting its own replay makes it independent of other tabs.
+
+The home stadium appears at low opacity on a light background, with a compact scoreline and all live
+components visible together: momentum, shot map, top stats, passing
+network and match notes. The broadcast canvas scales to the window without
+scrollbars or navigation. Use a landscape display for readable text. Replay
+controls collapse on playback and can be reopened. The original progression
+momentum remains selectable, and the passing network retains its team selector.
+
+Stadium backgrounds use Wikipedia’s freely licensed page images with photographer
+and license credit linking to the original file. Grounds match the 2015/16 replay
+season. If Wikipedia or Wikimedia is unavailable, a neutral background is used.
+
+### Ask about the match so far (Microsoft Agent Framework + Gemini)
+
+Set `GAME_GEMINI_API_KEY` in your local `.env` and restart `pipenv run dev`.
+The overlay’s **Ask about the match so far.** panel supports suggested questions
+and free text, with answers written for casual fans. Only user questions trigger model requests.
+`GAME_GEMINI_MODEL` defaults to `gemini-3.8-flash`; select a model your account
+can access. Keep the API key on the server and out of source control.
+
+Microsoft Agent Framework runs a two-stage workflow locally: an evidence executor
+invokes `get_match_stats`, `get_recent_events`, and `get_player_summary`; a narration
+executor sends that evidence to Gemini and validates the answer’s event citations.
+Tool selection is deterministic, not model-directed. Each question runs in isolation
+and normally makes one LLM request. This is Microsoft orchestration with Google’s
+Gemini model, not a Microsoft-hosted model. Agent Framework needs no Azure account
+or credit card; Gemini API quotas and account requirements still apply.
+
+Each question captures the score, match-to-date statistics, passing networks and
+the latest 60 recorded events at the current replay clock. Gemini is instructed
+to answer only from this context; event references are checked against the
+supplied excerpt. It receives no future match events or final-result fields.
+Player passing summaries cover the current network window, which resets after
+substitutions or sending-offs; they are not full-match player totals.
+This is context grounding and citation validation, not a guarantee that every
+generated statement is correct. The backend trusts the local viewing client's
+snapshot; a public multi-user deployment should use authoritative server sessions.
+
+Answers show their snapshot time and evidence when available. Resetting cancels
+pending answers. Provider failures and quota limits are shown explicitly; no
+canned response is passed off as AI output. Free-tier availability depends on
+the Gemini account and model.

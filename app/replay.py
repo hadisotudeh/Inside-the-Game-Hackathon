@@ -67,7 +67,19 @@ async def replay_updates(events: list[dict], match: dict, speed: float, disconne
                         "team",
                         "player",
                         "location",
+                        "possession",
+                        "possession_team",
                     )
+                },
+                "event_details": {
+                    kind: {key: event[kind][key] for key in fields if key in event[kind]}
+                    for kind, fields in {
+                        "pass": ("recipient", "outcome", "type"),
+                        "substitution": ("replacement",),
+                        "bad_behaviour": ("card",),
+                        "foul_committed": ("card",),
+                    }.items()
+                    if isinstance(event.get(kind), dict)
                 },
                 "end_location": next(
                     (

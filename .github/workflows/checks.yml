@@ -1,0 +1,23 @@
+name: Python checks
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    env:
+      PIPENV_VENV_IN_PROJECT: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - run: python -m pip install pipenv==2026.6.1
+      - run: pipenv verify
+      - run: pipenv sync --dev
+      - run: pipenv run lint
+      - run: pipenv run format --check
+      - run: pipenv run test

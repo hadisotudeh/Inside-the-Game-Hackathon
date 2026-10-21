@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Touchline — Match analysis</title>
   <meta name="description" content="Replay Premier League matches with shot maps, attacking momentum and match commentary.">
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/style.css?v=momentum-explanation-3">
   <script src="/static/app.js" defer></script>
 </head>
 <body>
@@ -16,10 +16,10 @@
     <span class="header-season">Premier League <span>2015/16</span></span>
   </header>
   <main id="analysis">
-    <div class="page-heading"><div><p class="breadcrumb">Football <span aria-hidden="true">/</span> Premier League <span aria-hidden="true">/</span> 2015/16</p><h1>Match analysis</h1></div><p class="replay-note" id="provenance">Historical event replay</p></div>
+    <div class="page-heading"><div><p class="breadcrumb">Football <span aria-hidden="true">/</span> Premier League <span aria-hidden="true">/</span> 2015/16</p></div><p class="replay-note" id="provenance">Live event replay</p></div>
     <section class="control-bar" aria-label="Replay controls">
       <label class="match-select" for="match">Match<select id="match"><option>Loading matches…</option></select></label>
-      <label class="speed-select" for="speed">Speed<select id="speed"><option value="1">1× · Real time</option><option value="15">15×</option><option value="30" selected>30×</option><option value="60">60×</option></select></label>
+      <label class="speed-select" for="speed">Speed<select id="speed"><option value="1">1× · Real time</option><option value="2" selected>2×</option></select></label>
       <div class="playback-buttons"><button id="retryFixtures" class="secondary" hidden>Retry loading</button><button id="play" class="primary" disabled>Start replay</button><button id="reset" class="secondary" aria-label="Reset replay to kick-off" title="Reset to kick-off">Reset</button></div>
     </section>
     <div class="context-row"><span id="status" role="status">Loading matches from StatsBomb…</span><span class="data-delay">Events appear in match order. No spoilers.</span></div>
@@ -27,46 +27,68 @@
       <section class="match-card" aria-label="Match score">
         <div class="match-meta"><span>Premier League <span class="meta-separator">·</span> <span id="matchDate">2015/16</span></span><span class="live-badge" id="liveBadge">Not started</span></div>
         <div class="scoreboard">
-          <div class="club home-club"><a class="crest" id="homeCrestLink" target="_blank" rel="noopener" aria-label="Home team on Wikipedia"><img id="homeCrest" alt="" hidden><span id="homeInitial">H</span></a><span id="homeName">Home team</span><small>Home</small></div>
+          <div class="club home-club"><a class="crest" id="homeCrestLink" target="_blank" rel="noopener" aria-label="Home team on Wikipedia"><img id="homeCrest" alt="" hidden><span id="homeInitial">H</span></a><span id="homeName">Home team</span><small>Home</small><ul id="homeScorers" class="goal-scorers" aria-label="Home goals" aria-live="polite" hidden></ul></div>
           <div class="score-center"><div class="score"><span id="homeScore">0</span><span class="score-divider">–</span><span id="awayScore">0</span></div><div class="clock" id="clock">00:00</div></div>
-          <div class="club away-club"><a class="crest" id="awayCrestLink" target="_blank" rel="noopener" aria-label="Away team on Wikipedia"><img id="awayCrest" alt="" hidden><span id="awayInitial">A</span></a><span id="awayName">Away team</span><small>Away</small></div>
+          <div class="club away-club"><a class="crest" id="awayCrestLink" target="_blank" rel="noopener" aria-label="Away team on Wikipedia"><img id="awayCrest" alt="" hidden><span id="awayInitial">A</span></a><span id="awayName">Away team</span><small>Away</small><ul id="awayScorers" class="goal-scorers" aria-label="Away goals" aria-live="polite" hidden></ul></div>
         </div>
         <div class="score-event-status"><span class="tiny-dot home-dot" aria-hidden="true"></span><span id="latestAction">Waiting for kick-off</span></div>
       </section>
       <section class="momentum-card panel" id="momentumSection" aria-labelledby="momentumTitle">
-        <div class="section-heading"><div><h2 id="momentumTitle">xT momentum</h2><p>Per-action attacking progression · 15-second smoothing half-life.</p></div><button id="method" class="text-button" aria-expanded="false" aria-controls="methodNote">How it works</button></div>
-        <div class="momentum-key"><span><i class="tiny-dot home-dot" aria-hidden="true"></i><span id="homeLegend">Home</span></span><span><i class="tiny-dot away-dot" aria-hidden="true"></i><span id="awayLegend">Away</span></span><span>⚽ Shot · size reflects xG · home above, away below</span><span id="balanceLabel">Waiting for xT data</span></div>
-        <svg id="momentum" viewBox="0 0 900 150" role="img" aria-label="Rolling net xT difference: home advantage above the line, away advantage below"></svg>
-        <div class="axis"><span>0′</span><span>15′</span><span>30′</span><span>HT</span><span>60′</span><span>75′</span><span>FT</span></div>
-        <p id="methodNote" class="method-note" hidden>Each completed open-play pass or carry adds end-location xT minus start-location xT, using Karun Singh’s pretrained 12×8 grid recommended by socceraction. Each action adds its signed xT; its influence halves every 15 seconds of match time. Plot the smoothed home-minus-away difference, resetting each half. Shots, failed passes and restarts are excluded. This measures attacking ball progression, not win probability or defensive value. Missing movement coordinates mark the remainder of that half incomplete. The chart rescales as the match progresses.</p>
+        <div class="section-heading"><div><h2 id="momentumTitle">Match momentum</h2><p id="momentumDescription">Attacking progression · xT per action.</p></div><button id="method" class="text-button" aria-expanded="false" aria-controls="methodNote">How it works</button></div>
+        <div class="momentum-legends"><div class="momentum-key"><span><i class="tiny-dot home-dot" aria-hidden="true"></i><span id="homeLegend">Home</span></span><span><i class="tiny-dot away-dot" aria-hidden="true"></i><span id="awayLegend">Away</span></span></div><span class="momentum-event-key">○ Shot · ⚽ GOAL · size reflects xG</span></div>
+        <svg id="momentum" viewBox="0 -30 900 210" role="img" aria-label="Net attacking progression: home minus away"></svg>
+        <div class="axis" id="momentumAxis"><span>0′</span><span>0′</span></div>
+        <p id="methodNote" class="method-note" hidden>Each mark shows the xT change from one completed open-play pass or carry: home minus away. Positive values use the home color; negative values use the away color. Backward moves can favor the opponent. Values are not accumulated or faded over time. Shots, failed passes and restarts are excluded. This measures progression, not possession or scoring probability.</p>
       </section>
       <section class="shot-card panel" id="shots" aria-labelledby="shotsTitle">
         <div class="section-heading"><div><h2 id="shotsTitle">Shots</h2><p>Where chances are created, and how good they are.</p></div><div class="segmented" role="group" aria-label="Filter shots by team"><button data-filter="all" class="active" aria-pressed="true">All</button><button data-filter="home" aria-pressed="false">Home</button><button data-filter="away" aria-pressed="false">Away</button></div></div>
-        <div class="shot-period-control"><label for="shotPeriod">Period<select id="shotPeriod"><option value="current">Follow match</option><option value="1">1st half</option><option value="2">2nd half</option><option value="all">Whole match</option></select></label><span id="shotPeriodLabel">1st half</span></div><div class="shot-stats"><div><span class="team-dot home-dot" aria-hidden="true"></span><span id="homeShort">Home</span><strong id="homeXg">0.000<small>xG</small></strong><span id="homeShots">0 shots</span></div><div><span class="team-dot away-dot" aria-hidden="true"></span><span id="awayShort">Away</span><strong id="awayXg">0.000<small>xG</small></strong><span id="awayShots">0 shots</span></div></div>
-        <div class="shot-pitch"><svg id="shotPitch" viewBox="0 0 120 80" role="img" aria-label="Shot map with opposing attacking directions and halftime end changes"></svg><p id="shotEmpty" class="chart-empty">Shots will appear here as the match unfolds.</p></div>
+        <div class="shot-period-control"><label for="shotPeriod">Period<select id="shotPeriod"><option value="current">Follow match</option><option value="1">1st half</option><option value="2">2nd half</option><option value="all" selected>Whole match</option></select></label><span id="shotPeriodLabel">Whole match</span></div><div class="shot-stats"><div><span class="team-dot home-dot" aria-hidden="true"></span><span id="homeShort">Home</span><strong id="homeXg">0.000<small>xG</small></strong><span id="homeShots">0 shots</span></div><div><span class="team-dot away-dot" aria-hidden="true"></span><span id="awayShort">Away</span><strong id="awayXg">0.000<small>xG</small></strong><span id="awayShots">0 shots</span></div></div>
+        <div class="shot-pitch"><svg id="shotPitch" viewBox="0 0 120 80" role="img" aria-label="Shot map: home attacks left to right and away attacks right to left in every period"></svg><p id="shotEmpty" class="chart-empty">Shots will appear here as the match unfolds.</p></div>
         <div class="shot-legend"><span id="shotDirections">Home → · Away ←</span><span><i class="legend-ring" aria-hidden="true"></i> Shot <i class="legend-goal" aria-hidden="true"></i> Goal <span class="legend-divider">·</span> Size reflects xG</span></div>
-        <p class="direction-note">Display convention: home attacks right in the first half; ends switch at halftime.</p><div class="shot-selection"><span class="selection-label">Selected shot</span><p id="shotDetails" aria-live="polite">Select a marker for the player, outcome and xG.</p></div>
+        <p class="direction-note">Home attacks left to right · Away attacks right to left · All periods.</p><div class="shot-selection"><span class="selection-label">Selected shot</span><p id="shotDetails" aria-live="polite">Select a marker for the player, outcome and xG.</p></div>
 
       </section>
       <section class="events-card panel" id="eventLocations" aria-labelledby="eventLocationsTitle">
-        <div class="section-heading"><div><h2 id="eventLocationsTitle">Event locations</h2><p>The latest recorded action on the pitch.</p></div></div>
-        <div class="match-pitch"><svg id="livePitch" viewBox="0 0 120 80" role="img" aria-label="Latest event location; not continuous player tracking"></svg><div class="pitch-caption"><span id="eventLabel">No events yet</span><span id="eventPlayer">Event positions only</span></div><div id="goalFlash" class="goal-flash" hidden>Goal</div></div><div class="match-footer"><span>Positions shown when recorded in the event data.</span><span id="eventCount">0 events</span></div>
+        <div class="section-heading"><div><h2 id="eventLocationsTitle">Match pitch</h2><p>Live actions and recorded shot snapshots.</p></div><button id="followShot" class="text-button" aria-pressed="true">Following live</button></div>
+        <div class="match-pitch"><svg id="livePitch" viewBox="0 0 120 80" role="img" aria-label="Latest event location; not continuous player tracking"></svg><div class="pitch-caption"><span id="eventLabel">No events yet</span><span id="eventPlayer">Event positions only</span></div><div id="goalFlash" class="goal-flash" hidden>Goal</div></div>
         <section id="shotFramePanel" class="shot-frame-panel" hidden aria-labelledby="shotFrameTitle">
-          <div class="frame-heading"><div><h3 id="shotFrameTitle">Shot snapshot</h3><p id="shotFrameCaption" aria-live="polite"></p></div><button id="followShot" class="text-button" aria-pressed="true">Following latest shot</button></div>
-          <div class="frame-pitch"><svg id="shotFramePitch" viewBox="0 0 120 80" role="img" aria-label="Recorded player positions at the moment of the shot"></svg><p id="shotFrameEmpty" class="chart-empty" hidden>No player snapshot recorded for this shot.</p></div>
+          <div class="frame-heading"><div><h3 id="shotFrameTitle">Shot snapshot</h3><p id="shotFrameCaption" aria-live="polite"></p></div></div>
+          <p id="shotFrameEmpty" class="frame-note" hidden>No player snapshot recorded for this shot. Showing the shot location.</p>
           <div class="frame-legend"><span><i class="frame-shooter-key" aria-hidden="true"></i> Shooter</span><span><i id="frameAttackKey" class="tiny-dot" aria-hidden="true"></i> Teammate</span><span><i id="frameDefendKey" class="tiny-dot" aria-hidden="true"></i> Opponent</span><span><i class="frame-keeper-key" aria-hidden="true"></i> Goalkeeper</span></div>
-          <p class="frame-note">Shot-time snapshot · recorded players only, not continuous tracking. Hover or focus a player for their name.</p>
+          <p class="frame-note">Shot-time snapshot · recorded players only. Hover or focus a player for their name.</p>
         </section>
+        <div class="match-footer"><span>Positions shown when recorded in the event data.</span><span id="eventCount">0 events</span></div>
+      </section>
+      <div class="analysis-sidebar">
+      <section class="top-stats panel" aria-labelledby="statsTitle">
+        <div class="section-heading"><div><h2 id="statsTitle">Top stats</h2><p>Match totals · events shown so far</p></div></div>
+        <div class="stats-content">
+          <p class="share-label" title="Estimated from elapsed time between recorded possession events, excluding explicit stoppages and period breaks.">Ball possession</p>
+          <div id="possessionShare" class="stat-share" role="img" aria-label="Waiting for possession data"><span id="homeShare">—</span><span id="awayShare">—</span></div>
+          <div class="stat-row"><strong id="statHomeXg">0.000</strong><span>Expected goals (xG)</span><strong id="statAwayXg">0.000</strong></div>
+          <div class="stat-row"><strong id="statHomeShots">0</strong><span>Total shots</span><strong id="statAwayShots">0</strong></div>
+          <div class="stat-row"><strong id="statHomeOnTarget">0</strong><span class="stat-help" tabindex="0" aria-describedby="onTargetHelp">Shots on target <span aria-hidden="true">ⓘ</span></span><strong id="statAwayOnTarget">0</strong><span id="onTargetHelp" class="stat-tooltip" role="tooltip">Shots that result in a goal, a save, or a save onto the post. Blocked shots, misses and shots directly hitting the post are excluded.</span></div>
+          <div class="stat-row"><strong id="statHomePassCompletion">—</strong><span class="stat-help" tabindex="0" aria-describedby="passCompletionHelp">Pass completion <span aria-hidden="true">ⓘ</span></span><strong id="statAwayPassCompletion">—</strong><span id="passCompletionHelp" class="stat-tooltip" role="tooltip">Completed passes divided by attempted passes, including set pieces. Hover a percentage to see completed and attempted counts.</span></div>
+          <div class="stat-row"><strong id="statHomeFieldTilt">—</strong><span class="stat-help" tabindex="0" aria-describedby="fieldTiltHelp">Field tilt <span aria-hidden="true">ⓘ</span></span><strong id="statAwayFieldTilt">—</strong><span id="fieldTiltHelp" class="stat-tooltip" role="tooltip">Each team’s share of both teams’ completed passes starting in the attacking third. Higher values indicate more territorial control. Match totals so far.</span></div>
+        </div>
+      </section>
+
+      <section class="passing-card panel" aria-labelledby="passingTitle">
+        <div class="section-heading"><div><h2 id="passingTitle">Passing network</h2><p>Average pass and reception positions.</p></div></div>
+        <div class="passing-controls"><label for="passingTeam">Team</label><select id="passingTeam"><option value="home">Home</option><option value="away">Away</option></select></div>
+        <div class="passing-status"><p class="passing-direction">Attacking →</p><span id="passingProgress">Waiting for kick-off</span></div>
+        <div class="passing-pitch"><svg id="passingPitch" viewBox="0 0 120 80" role="img" aria-label="Live passing network, attacking from left to right"></svg><p id="passingEmpty" class="chart-empty">Completed passes will build the network.</p></div>
+        <div class="passing-summary"><span id="passingWindow">Since kick-off</span><strong id="passingCount">0 completed passes</strong></div>
+        <p class="passing-note">Larger circles = more pass involvement. Thicker lines = more completed passes between players. Resets after this team’s substitutions or sending-offs. Hover or focus for names and counts.</p>
       </section>
       <aside class="insights-card panel" id="commentary" aria-labelledby="commentaryTitle">
-        <div class="section-heading"><div><h2 id="commentaryTitle">Match notes</h2><p>Context for the chances you’ve seen.</p></div></div>
-        <div class="lens-switch" role="group" aria-label="Commentary detail"><button data-audience="casual" class="active" aria-pressed="true">Overview</button><button data-audience="analyst" aria-pressed="false">Detailed</button></div>
-        <div id="insightList" aria-live="polite"><div class="empty-insight"><div class="empty-rule" aria-hidden="true"></div><h3>No notes yet</h3><p>Start the replay. Notes will appear after shots, with a link to the chance behind each one.</p></div></div>
-        <div class="insight-footer"><span id="providerLabel">Template commentary</span><span class="provider-detail">Based on events shown so far.</span></div>
+        <div class="section-heading"><div><h2 id="commentaryTitle">Match notes</h2><p>Live event timeline · latest first.</p></div></div>
+        <div id="insightList" aria-live="polite"><div class="empty-insight"><div class="empty-rule" aria-hidden="true"></div><h3>No notes yet</h3><p>Recorded actions will appear here as the replay unfolds.</p></div></div>
+        <div class="insight-footer"><span id="providerLabel">Live event timeline</span><span class="provider-detail">Based on events shown so far.</span></div>
       </aside>
+      </div>
     </div>
     <footer><a class="footer-brand" href="/">touchline.</a><div class="source-credit"><span>Publicly available match data by</span><a href="https://github.com/hudl/open-data" target="_blank" rel="noopener"><img src="/static/assets/statsbomb.png?v=hudl-original" alt="StatsBomb" width="118" height="26"></a></div><div class="footer-links"><a href="/static/assets/sources.json" target="_blank" rel="noopener">Crest credits</a><a href="/docs" target="_blank" rel="noopener">API documentation</a></div></footer>
   </main>
-  <dialog id="restartDialog" aria-labelledby="restartTitle"><h2 id="restartTitle">Restart with a different commentary style?</h2><p>Changing the style starts the match again from kick-off.</p><div><button id="cancelLens" class="secondary">Keep watching</button><button id="confirmLens" class="primary">Restart replay</button></div></dialog>
 </body>
 </html>
