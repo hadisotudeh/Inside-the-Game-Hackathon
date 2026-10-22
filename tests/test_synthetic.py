@@ -15,7 +15,7 @@ def test_synthetic_match_is_reproducible_and_consistent():
     assert [e["index"] for e in events] == list(range(1, len(events) + 1))
     state = MatchAnalytics(101, 202)
     for period in (1, 2):
-        half = [e for e in events if e["period"] == period]
+        half = [e for e in events if e["period"] == period and e["type"]["name"] != "Starting XI"]
         assert half[0]["type"]["name"] == "Half Start"
         assert half[-1]["type"]["name"] == "Half End"
         assert [period_seconds(e) for e in half] == sorted(period_seconds(e) for e in half)
@@ -26,6 +26,60 @@ def test_synthetic_match_is_reproducible_and_consistent():
         state.consume(event)
     assert len(state.shots) > 10
     assert sum(state.score.values()) == sum(s["outcome"] == "Goal" for s in state.shots)
+
+
+def test_synthetic_possessions_and_players_support_real_analytics():
+    events = asyncio.run(SyntheticSource().events(1))
+    roster = {}
+    for event in events:
+        if event["type"]["name"] == "Starting XI":
+            roster[event["team"]["id"]] = {
+                entry["player"]["id"] for entry in event["tactics"]["lineup"]
+            }
+    assert all(len(players) == 11 for players in roster.values())
+    completed, incomplete = 0, 0
+    for event in events:
+        team = event["team"]["id"]
+        assert event["possession_team"]["id"] in roster
+        if "player" in event:
+            assert event["player"]["id"] in roster[team]
+        if "pass" in event:
+            assert event["pass"]["recipient"]["id"] in roster[team]
+            assert event["pass"]["recipient"]["id"] != event["player"]["id"]
+            if event["pass"].get("outcome"):
+                incomplete += 1
+            else:
+                completed += 1
+        if "shot" in event:
+            assert 0 < event["shot"]["statsbomb_xg"] < 1
+    assert completed > incomplete > 0
+    assert {"Pressure", "Ball Recovery"} <= {e["type"]["name"] for e in events}
+    state = MatchAnalytics(101, 202)
+    for event in events:
+        state.consume(event)
+    assert any(team["passes"] > 0 for team in state.passing_networks.teams.values())
+
+
+def test_synthetic_build_runs_without_historical_data(monkeypatch):
+    from app.source import StatsBombSource
+    from tools.demo.server import app
+
+    async def reject_historical_fetch(*args, **kwargs):
+        raise AssertionError("Synthetic build must not fetch historical data")
+
+    monkeypatch.setattr(StatsBombSource, "_get", reject_historical_fetch)
+    with TestClient(app) as client:
+        assert client.get("/health").json() == {"status": "ok"}
+        fixture = client.get("/matches").json()[0]
+        assert fixture["source"] == "synthetic"
+        overlay = client.get("/overlay").text
+        assert "SYNTHETIC REPLAY" in overlay
+        assert "/static/stadium.js" not in overlay
+        assert 'value="60" selected' in overlay
+        assert client.get("/matches/999/stream").status_code == 404
+        stream = client.get("/matches/1/stream?speed=1000").text
+        assert "event: complete" in stream
+        assert "Northbridge" in stream
 
 
 def test_score_counts_own_goals_once():

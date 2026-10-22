@@ -1,0 +1,72 @@
+{
+  "model": "english_2026-09_2",
+  "reference_sha256": "87aa2b2ab6edb7a6fedab6d7a6396f4a97de0b8eee686b665ba400cf99b1d7ae",
+  "reference_source_offset_seconds": 43.9,
+  "reference_duration_seconds": 15.8,
+  "generation": "Local synthetic speech from the reference; similarity needs owner review.",
+  "output": "artifacts/demo/touchline-demo.mp4",
+  "duration": 86.98,
+  "video_matches_original": true,
+  "video_stream_sha256": "SHA256=9ba4592cc928f7d84be7d0442fbb8b06d4fc700b462a11c9a5a421a8df802dd0",
+  "decode_check": "passed",
+  "chapters": [
+    {
+      "chapter": 0,
+      "start": 0.3,
+      "end": 5.732,
+      "natural_duration": 5.04,
+      "tempo_factor": 1.0
+    },
+    {
+      "chapter": 1,
+      "start": 5.732,
+      "end": 13.66,
+      "natural_duration": 6.88,
+      "tempo_factor": 1.0
+    },
+    {
+      "chapter": 2,
+      "start": 13.66,
+      "end": 25.092,
+      "natural_duration": 9.52,
+      "tempo_factor": 1.0
+    },
+    {
+      "chapter": 3,
+      "start": 25.092,
+      "end": 32.228,
+      "natural_duration": 6.24,
+      "tempo_factor": 1.0
+    },
+    {
+      "chapter": 4,
+      "start": 32.228,
+      "end": 42.604,
+      "natural_duration": 9.52,
+      "tempo_factor": 1.0
+    },
+    {
+      "chapter": 5,
+      "start": 42.604,
+      "end": 55.572,
+      "natural_duration": 10.64,
+      "tempo_factor": 1.0
+    },
+    {
+      "chapter": 6,
+      "start": 55.572,
+      "end": 65.468,
+      "natural_duration": 7.92,
+      "tempo_factor": 1.0
+    },
+    {
+      "chapter": 7,
+      "start": 65.468,
+      "end": 85.78,
+      "natural_duration": 16.88,
+      "tempo_factor": 1.0
+    }
+  ],
+  "timing": "Pitch-preserving tempo adjustment to chapter slots; captions unchanged.",
+  "selection": "Approved by the project owner as the final demo."
+}

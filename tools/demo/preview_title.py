@@ -9,7 +9,7 @@ from title_card import opening_card
 
 
 async def main():
-    out = Path(os.environ.get("TOUCHLINE_DEMO_OUT", "artifacts/demo-real"))
+    out = Path(os.environ.get("TOUCHLINE_DEMO_OUT", "artifacts/demo"))
     html = (
         "<html><head><style>"
         + Path("tools/demo/editorial.css").read_text()

@@ -37,3 +37,23 @@ Photographer and license are displayed beneath the overlay, linked to the file
 description. Photos are loaded remotely, not bundled; a dark gradient is applied
 over the original image for readability. Photo date is not guaranteed to match
 the replay season. A neutral background is used if lookup or loading fails.
+
+## Demo titles and narration
+
+The title cards use Microsoft and Premier League logos stored under
+`tools/demo/assets/`. They identify the event organizers; the code license does
+not grant trademark rights. Confirm organizer permission for submitted video use.
+The final demo also shows historical club marks and a stadium photo with an
+on-screen source credit. Recordings preserve the displayed attribution, but
+permission for the required submission/promotional use remains an entrant check.
+
+The final narration is synthetic speech modeled on Hadi Sotudeh’s own supplied
+voice reference, approved by Hadi for use in the demo. It was generated locally
+with [Kyutai Pocket TTS](https://github.com/kyutai-labs/pocket-tts), using
+`pocket-tts` 4.0.1 and model `english_2026-09_2`. The model publisher lists
+[CC BY 4.0](https://huggingface.co/kyutai/pocket-tts) for the weights; the
+Pocket TTS software is MIT-licensed. Attribution: Kyutai, Pocket TTS. The
+reference recording and derived voice state are private production inputs,
+not repository assets. This narration is a demo-production choice, not an
+Azure Speech integration or an application feature. No music or broadcast
+match footage is included.

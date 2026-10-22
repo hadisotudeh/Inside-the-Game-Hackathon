@@ -1,0 +1,62 @@
+{
+  "url": "http://127.0.0.1:8000/overlay",
+  "match_id": 3754217,
+  "match": "Chelsea v Arsenal, 19 September 2015",
+  "source": "StatsBomb historical open data",
+  "speed": 60,
+  "page_errors": [],
+  "chat_responses": [
+    {
+      "status": 200,
+      "body": {
+        "text": "Chelsea have created the better chances so far. While both teams have taken four shots, Chelsea have generated 0.476 expected goals (xG) compared to Arsenal's 0.1184 xG, and Chelsea have put three shots on target compared to Arsenal's one.",
+        "evidence_event_ids": [],
+        "provider": "Gemini",
+        "mode": "simple",
+        "as_of": {
+          "minute": 37,
+          "second": 10,
+          "period": 1
+        },
+        "evidence": [],
+        "orchestrator": "Microsoft Agent Framework",
+        "tools_used": [
+          "get_match_stats",
+          "get_recent_events",
+          "get_player_summary"
+        ]
+      }
+    }
+  ],
+  "clock_samples": [
+    {
+      "chapter": 1,
+      "clock": "00:09"
+    },
+    {
+      "chapter": 2,
+      "clock": "08:04"
+    },
+    {
+      "chapter": 3,
+      "clock": "19:32"
+    },
+    {
+      "chapter": 4,
+      "clock": "26:40"
+    },
+    {
+      "chapter": 5,
+      "clock": "37:10"
+    },
+    {
+      "chapter": 6,
+      "clock": "46:21"
+    },
+    {
+      "chapter": 7,
+      "clock": "56:16"
+    }
+  ],
+  "duration_seconds": 86.98
+}

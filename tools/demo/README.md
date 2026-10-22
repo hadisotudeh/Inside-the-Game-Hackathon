@@ -1,112 +1,87 @@
-# Touchline demo package
+# Final demo production
 
-Final video: `artifacts/demo/touchline-demo.mp4` (1:58, 1920×1080, H.264/AAC).
-English synthetic voiceover, visible captions, selectable English subtitle track,
-original opening/closing graphics, browser footage and close-ups. No music or
-match footage. Transcript and captions are in `artifacts/demo/`.
+The single approved video is
+[artifacts/demo/touchline-demo.mp4](../../artifacts/demo/touchline-demo.mp4),
+86.98 seconds at 1920×1080. It uses the owner's reference-conditioned synthetic
+voice, with no speech speed-up. Earlier preset-voice versions and their unused
+production scripts have been removed.
 
-## What was recorded
+For ordinary app testing, follow [the judge guide](../../docs/judging.md).
+Production tools are optional and separate from the Pipenv runtime dependencies.
 
-This is the actual `/overlay` UI with the existing SSE replay, analytics and
-Agent Framework/Gemini chat. `server.py` selects the existing fictional generator
-(seed 42) instead of historical data. Its small adapter adds possession IDs and
-pass recipients for the possession and network displays. All 693 events pass
-through the ordinary analytics engine. No answers or statistics are mocked.
+## Files and inputs
 
-The separate demo build replaces historical branding, removes stadium imagery,
-labels synthetic replay and heuristic xG, and offers 60× replay. Camera moves,
-highlights and titles are editorial additions. Editorial CSS also exposes the
-existing selected-shot details, which the normal overlay stylesheet hides.
-The default application and its historical source are unchanged.
+- `artifacts/demo/timeline.json`: the fixed chapter starts, durations and script.
+- `voice_reference.py`: generate local reference-conditioned narration and replace
+  the canonical video's audio while copying its compressed picture stream.
+- `record_real.py`: record the historical overlay using the fixed timeline.
+- `export_real.py`: combine a fresh raw take with the approved narration and captions.
+- `title_card.py` and `editorial.css`: opening/closing graphics and camera styling.
+- `server.py`: the synthetic judge build on port 8012, run with `pipenv run demo`.
 
-Two takes of the same seeded replay are edited together (`edit.json`). The first
-contains a real HTTP 200 Gemini response, with Microsoft Agent Framework and all
-three evidence tools reported by the backend. Its second question receives a
-real HTTP 429 quota error, shown during the reliability section. The clearer
-selected-shot segment comes from the second take. That take's AI request also
-received HTTP 429; it is not substituted for the successful AI segment.
-The editorial quote at 1:03 repeats the successful response verbatim and is
-labeled with its original snapshot time, 48:56. It is not another AI request.
+The private voice reference is expected at
+`artifacts/demo/production/voice/reference.wav`. The original reference and
+voice state are not distributed. A fresh clone can run the application and
+play the final video; recreating the narrator requires the owner's private
+reference or another speaker's authorized reference. The model and generated
+voice are production tools, not an application feature.
 
-Narration uses the synthetic `en-GB-RyanNeural` voice through edge-tts. Narration
-is a video production asset, not a feature claimed for the app. Azure deployment
-and production broadcast synchronization are explicitly described as next steps.
-The two deterministic workflow stages are not presented as independently
-reasoning autonomous agents.
+## Regenerate narration
 
-## Rules checked, October 21, 2026
-
-The supplied [event page](https://innovationstudio.microsoft.com/hackathons/insidethegamedeveloperhackathon)
-redirected to Microsoft sign-in. No private event-page content was accessible.
-Rules were checked against Microsoft's [official rules](https://github.com/microsoft/insidethegamehackathon/blob/main/OFFICIAL%20RULES.md).
-
-The video stays below two minutes, shows functioning software, uses English,
-and demonstrates synthetic events with explainable on-screen intelligence.
-Before submission, confirm registration and entrant eligibility, data/asset
-permissions, category fit, a public GitHub repository, a public video URL on an
-accepted host, and a judge-accessible build through the end of judging.
-A video alone does not establish eligibility or guarantee a winning entry.
-
-Product work remains: the synthetic generator is deliberately simple, with
-completed passes/carries/shots and heuristic xG. Its football realism has not
-been evaluated; failed passes, defensive events and richer player behavior need
-work. Audience personalization in the overlay is through questions and team
-selection; the visible chat currently uses casual mode. The existing API also
-supports analyst mode. Do not claim tested Azure hosting, Foundry inference,
-production feed synchronization, calibrated synthetic xG, or full category
-compliance on the strength of this recording.
-
-## Reproduce and edit
-
-Run from the repository root. Normal application dependencies use the existing
-Pipenv environment. Production tooling also requires FFmpeg, Chrome/Chromium,
-Playwright and edge-tts. For this build, the latter two were installed into
-`/tmp/touchline-video-tools`, without changing application dependencies.
+Requires Python 3.14, FFmpeg, Pocket TTS 4.0.1 and CPU PyTorch. Install in a separate
+local environment, leaving application dependencies unchanged:
 
 ```bash
-.venv/bin/python -m tools.demo.server
-# In a second terminal (network access is needed for voice and real Gemini):
-PYTHONPATH=/tmp/touchline-video-tools .venv/bin/python tools/demo/voice.py
-PYTHONPATH=/tmp/touchline-video-tools .venv/bin/python tools/demo/record.py
-.venv/bin/python tools/demo/export.py --latest
+python3.14 -m venv /tmp/touchline-clone-env
+/tmp/touchline-clone-env/bin/python -m pip install pocket-tts==4.0.1 --extra-index-url https://download.pytorch.org/whl/cpu
 ```
 
-For the exact supplied edit, keep both original raw takes and run `export.py`
-without `--latest`. `edit.json` lists their paths. Edit `story.json` for narration
-and timing, `editorial.css` for recording presentation, and `export.py` for final
-caption/quote styling. Remove the corresponding cached `voice-N.mp3` before
-regenerating a changed narration chapter. Caption timings are estimated within
-chapters and can be refined in `captions.srt`.
-
-Raw recordings and audio are intentionally ignored by Git; the MP4 remains on
-disk for review and upload. The tools do not publish or submit anything.
-
-## Validation
-
-- Final media metadata and full decode checked: 118 seconds, H.264 video,
-  1920×1080, 30 fps, AAC audio, English mov_text subtitles.
-- No browser JavaScript errors in either take. Successful first-take response
-  reported `Microsoft Agent Framework` and `get_match_stats`,
-  `get_recent_events`, `get_player_summary`; real quota errors were explicit.
-- Synthetic source determinism, unique event IDs, analytics processing of all
-  693 events, and nonempty passing-network links verified.
-- Ruff passes for the demo tools.
-- Existing app suite: 49 passed, 1 failed. The failure is an existing assertion
-  in `tests/test_synthetic.py::test_viewing_routes_use_statsbomb_only` expecting
-  `overlay-score` in the current overlay HTML. Neither that test nor the normal
-  overlay HTML was modified by this work.
-
-## White opening slide
-
-Both recording scripts use `title_card.py` and the official logos in `assets/`.
-The opening uses a white background, DejaVu Sans, a 124 px headline, and larger
-supporting text. Render a standalone preview with:
+Review and accept the model conditions at
+<https://huggingface.co/kyutai/pocket-tts>, then authenticate locally:
 
 ```bash
-PYTHONPATH=/tmp/touchline-video-tools .venv/bin/python tools/demo/preview_title.py
+HF_HOME=/tmp/touchline-clone-cache /tmp/touchline-clone-env/bin/hf auth login
+/tmp/touchline-clone-env/bin/python tools/demo/voice_reference.py
 ```
 
-Preview: `artifacts/demo-real/opening-slide.png` (1920×1080).
-The existing historical take with the revised opening is exported separately as
-`artifacts/demo-real/touchline-demo-updated.mp4`; its original audio and subtitle
-tracks are preserved. The original recording remains available.
+The script caches chapters by script/reference hash, writes a natural-speed
+preview and narration, validates the muxed video, and atomically replaces
+`artifacts/demo/touchline-demo.mp4`. A changed voice or script can require tempo
+adjustments to fit the fixed visuals; the published version uses factor 1.0 for
+all eight chapters. Review the generated speech before replacing a release.
+The source reference, voice state and authentication must stay outside Git.
+
+## Record a new historical take
+
+Requires Google Chrome at `/usr/bin/google-chrome-stable`, FFmpeg with subtitles
+support, Playwright, and network access to historical data and Gemini.
+
+```bash
+pipenv run python -m pip install --target /tmp/touchline-video-tools playwright==1.64.0
+PYTHONPATH=/tmp/touchline-video-tools pipenv run python -m playwright install ffmpeg
+pipenv run start
+```
+
+With the server on port 8000 and a working Gemini key, use another terminal:
+
+```bash
+PYTHONPATH=/tmp/touchline-video-tools pipenv run python tools/demo/check_gemini.py
+# Generate approved narration first if narration.wav is absent locally.
+TOUCHLINE_DEMO_MICROSOFT=1 PYTHONPATH=/tmp/touchline-video-tools pipenv run python tools/demo/record_real.py
+pipenv run python tools/demo/export_real.py
+ffmpeg -v error -i artifacts/demo/touchline-demo.mp4 -f null -
+```
+
+The recorder produces one continuous take, screenshots, `raw-path.txt` and a
+response report. Export trims browser setup, burns captions and validates media
+format/duration. It requires a real successful chat response. Re-recording sends
+new provider requests; keep source labels and model/service claims accurate.
+The scripts overwrite canonical production outputs, so commit the approved
+release before a new production run.
+
+## Publication
+
+Only the approved MP4, transcript, captions and reviewable reports are included
+in the repository. The approved video is on [YouTube](https://youtu.be/o-lBHqRdArY);
+use that URL in the submission form. [Credits](../../docs/assets.md) identify third-party assets and
+Kyutai Pocket TTS. These tools do not publish videos or submit the hackathon form.

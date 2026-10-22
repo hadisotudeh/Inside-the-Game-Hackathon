@@ -35,10 +35,13 @@ def microsoft_card():
     <div class="eyebrow">TOUCHLINE / MICROSOFT TECHNOLOGY</div>
     <h1 style="font-size:86px">Built with Microsoft<br><span>Agent Framework.</span></h1>
     <div class="rule"></div>
-    <p style="font-size:32px;line-height:1.6"><strong>Implemented:</strong>
-    Three evidence tools → orchestration → Gemini explanation<br>
-    <strong>Adapter ready; verification pending:</strong> Microsoft Foundry explanations<br>
-    <strong>Proposed:</strong> Azure Container Apps hosting + Web PubSub shared updates<br>
-    <strong>Proposed:</strong> Application Insights monitoring + Key Vault secrets</p>
+    <div class="technology-list">
+      <div><strong>Implemented:</strong>
+      Three evidence tools → orchestration → Gemini explanation</div>
+      <div><strong>Adapter ready; verification pending:</strong>
+      Microsoft Foundry explanations</div>
+      <div><strong>Proposed:</strong> Azure Container Apps hosting + Web PubSub shared updates</div>
+      <div><strong>Proposed:</strong> Application Insights monitoring + Key Vault secrets</div>
+    </div>
     <div class="small">Designed for fans watching live TV and streaming
     · Real-time match insights</div>"""

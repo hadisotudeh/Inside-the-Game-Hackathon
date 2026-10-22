@@ -244,3 +244,12 @@ Thumbs.db
 /artifacts/*/*
 !/artifacts/*/README.md
 !/artifacts/*/*.srt
+
+# Keep only the approved demo and reviewable evidence; production inputs stay local.
+!/artifacts/demo/narration.txt
+!/artifacts/demo/timeline.json
+!/artifacts/demo/recording-report.json
+
+!/artifacts/demo/touchline-demo.mp4
+!/artifacts/demo/narration-report.json
+!/artifacts/demo/media-report.json

@@ -10,7 +10,7 @@ from pathlib import Path
 from playwright.async_api import async_playwright
 from title_card import microsoft_card, opening_card
 
-OUT = Path(os.environ.get("TOUCHLINE_DEMO_OUT", "artifacts/demo-real"))
+OUT = Path(os.environ.get("TOUCHLINE_DEMO_OUT", "artifacts/demo"))
 CSS = (
     Path("tools/demo/editorial.css").read_text()
     + """
@@ -134,6 +134,8 @@ async def main():
             await page.locator("#title-card").evaluate(
                 "(el, html) => {el.innerHTML = html; el.style.opacity = '1';}", microsoft_card()
             )
+        await at(total - 1)
+        await page.screenshot(path=str(OUT / "closing-slide.png"))
         await at(total)
         (OUT / "recording-report.json").write_text(
             json.dumps(

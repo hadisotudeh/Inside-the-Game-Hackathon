@@ -32,7 +32,8 @@ reviewed before integrating or redistributing data; open access is not blanket
 permission for every use. Sections 1.2.1, 1.2.2, and 7 restrict redistribution,
 commercial exploitation, and modification/transfer of the data. Obtain appropriate
 permission before exposing historical raw events through a shared replay app.
-No third-party data or logos are bundled here.
+Historical event files are not bundled. Club crests and attribution logos are
+bundled separately; see [asset credits](assets.md).
 Use independently generated fictional matches for the submission by default;
 document generation seeds, constraints, and any source influence. Verify rights
 before using historical data to train or calibrate a generator.
@@ -42,8 +43,9 @@ before using historical data to train or calibrate a generator.
 1. Match selection and per-session SSE replay are implemented for StatsBomb historical
    replay with explicit provenance and period clocks. Synthetic selection has
    been removed from the public interface and API.
-2. An internal fictional 90-minute generator produces reproducible test events.
-   Its distance-based xG is illustrative; evaluate realism before submission.
+2. A fictional 90-minute generator powers the runnable `pipenv run demo` build,
+   with rosters, possession, linked passes, failures, pressure and ball recovery.
+   Its distance-based xG is illustrative; independent realism evaluation remains open.
 3. Incremental momentum, shot maps, and score updates feed the browser matchroom.
    Shot selection exposes evidence; a transparent same-browser overlay is available.
 4. Casual/analyst explanations use either clearly labeled templates or the optional

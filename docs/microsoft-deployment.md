@@ -4,8 +4,8 @@
 
 The application runs locally with Pipenv. **Microsoft Agent Framework is integrated
 and has executed a real Gemini-backed question workflow during development.**
-The revised historical-match recording encountered a real Gemini HTTP 429 quota
-error, which is explicitly labeled in the video. This is Microsoft orchestration
+The final 87-second historical-match recording captured a real Gemini HTTP 200
+answer through all three evidence tools on October 22, 2026. This is Microsoft orchestration
 with a Google model, not Microsoft-hosted inference.
 
 No Azure resources are provisioned. The separate Microsoft Foundry Azure OpenAI
@@ -37,8 +37,8 @@ can start its own replay or join a matchroom in the same browser. The public app
 3. Extend the implemented shot-triggered explanations to other meaningful moments.
    Snapshot isolation, event references, casual/analyst modes, background inference,
    bounded requests, and failure fallbacks are already implemented.
-4. Evaluate the implemented Agent Framework/Gemini workflow, restore usable
-   provider quota for judge testing, and verify Foundry separately before claiming
+4. Evaluate the implemented Agent Framework/Gemini workflow, provide usable
+   provider access for judge testing, and verify Foundry separately before claiming
    Foundry inference. Provide reproducible setup and judge-access instructions.
 5. Prepare and test a container image and deployment configuration. Deploy to
    Azure only when cloud hosting is needed; document resources and associated costs.
@@ -83,8 +83,9 @@ claiming it in the pitch.
 The submission still needs a public repository, judge access with usable model
 quota, and a public URL for the recorded demo under two minutes. Agent Framework
 with Gemini has been exercised; real Foundry verification remains open. Casual/analyst personalization and
-on-screen insights are implemented. Synthetic selection has been removed from the public app. The generator remains
-an internal development utility; the synthetic-data requirement is still open.
+on-screen insights are implemented. The default app retains historical fixtures. The separate `pipenv run demo` build
+exposes the seeded synthetic source on port 8012; see [judge instructions](judging.md).
+Structural generator checks pass; independent football-realism evaluation remains open.
 
 ## References
 

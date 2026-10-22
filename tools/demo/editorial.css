@@ -27,3 +27,5 @@ body.broadcast-overlay{background:#101820!important;font-family:Arial,sans-serif
 #analysis.camera-shot{transform:translateX(-78%) scale(1.28)!important;top:-130px!important}
 #analysis.camera-network{transform:translateX(-70%) scale(1.25)!important;top:-390px!important}
 #analysis.camera-chat{transform:translateX(-87%) scale(1.37)!important;top:-435px!important}
+
+#title-card .technology-list{display:flex;flex-direction:column;gap:24px;font-size:32px;line-height:1.6;color:#394452;margin:22px 0 32px}

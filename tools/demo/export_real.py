@@ -6,7 +6,7 @@ import os
 import subprocess
 from pathlib import Path
 
-OUT = Path(os.environ.get("TOUCHLINE_DEMO_OUT", "artifacts/demo-real"))
+OUT = Path(os.environ.get("TOUCHLINE_DEMO_OUT", "artifacts/demo"))
 timeline = json.loads((OUT / "timeline.json").read_text())
 total = timeline["duration"]
 raw = Path((OUT / "raw-path.txt").read_text().strip())
@@ -43,10 +43,8 @@ for i, part in enumerate(timeline["chapters"][1:-1], 1):
 # Label the recorded provider outcome as an editorial annotation. This is
 # taken from the real response report, not an invented UI answer.
 request_report = json.loads((OUT / "recording-report.json").read_text())
-if OUT.name == "demo-american" and not any(
-    item["status"] == 200 for item in request_report["chat_responses"]
-):
-    raise RuntimeError("The clean narration requires a recorded successful AI answer; retry later.")
+if not any(item["status"] == 200 for item in request_report["chat_responses"]):
+    raise RuntimeError("The narration requires a recorded successful AI answer; retry later.")
 if any(item["status"] == 429 for item in request_report["chat_responses"]):
     error_start = timeline["chapters"][6]["start"] + 6
     error_end = timeline["chapters"][6]["end"] - 1
@@ -61,7 +59,7 @@ if any(item["status"] == 429 for item in request_report["chat_responses"]):
         f"fontcolor=white:enable='{enable}'"
     )
 vf += f",fade=t=out:st={total - 0.6}:d=0.6"
-final = OUT / "touchline-demo-real-match.mp4"
+final = OUT / "touchline-demo.mp4"
 subprocess.run(
     [
         "ffmpeg",

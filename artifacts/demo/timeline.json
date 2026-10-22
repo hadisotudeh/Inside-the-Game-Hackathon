@@ -1,0 +1,53 @@
+{
+  "duration": 86.98,
+  "chapters": [
+    {
+      "label": "THE STORY BEHIND THE SCORE",
+      "text": "The score tells you what's happened. But who's actually creating the danger? That's where Touchline comes in.",
+      "start": 0.3,
+      "end": 5.732
+    },
+    {
+      "label": "DESIGNED FOR LIVE TV AND STREAMING",
+      "text": "Think of it as a companion for fans watching live TV or a stream. Here, we're using a pitch view instead of broadcast footage.",
+      "start": 5.732,
+      "end": 13.66
+    },
+    {
+      "label": "WHAT IS FOOTBALL EVENT DATA?",
+      "text": "Each event tells us something: who made the pass, where a shot came from, what happened next. This demo uses recorded Premier League events. A live version would connect to a licensed feed.",
+      "start": 13.66,
+      "end": 25.092
+    },
+    {
+      "label": "REAL-TIME FAN EXPERIENCE / EVENT REPLAY",
+      "text": "Watch the clock and the stats. They update as each event comes in. We've sped up the replay so you can see it in action.",
+      "start": 25.092,
+      "end": 32.228
+    },
+    {
+      "label": "SEE WHERE THE DANGER COMES FROM",
+      "text": "Want a closer look? Pick a shot to see who took it and how good the chance was. The momentum chart tracks attacking moves. And the passing network shows who's connecting with whom.",
+      "start": 32.228,
+      "end": 42.604
+    },
+    {
+      "label": "MICROSOFT AGENT FRAMEWORK / THREE EVIDENCE TOOLS",
+      "text": "You can also ask the match a question. Microsoft Agent Framework gathers the stats, recent events and player summaries through three tools. Gemini uses that snapshot to explain what's happening, without looking ahead.",
+      "start": 42.604,
+      "end": 55.572
+    },
+    {
+      "label": "GEMINI / EVIDENCE-BASED MATCH ANSWER",
+      "text": "Here's the answer, grounded in the match so far. It compares the chances and points to the events behind them. The explanation follows the replay, without looking ahead.",
+      "start": 55.572,
+      "end": 65.468
+    },
+    {
+      "label": "MICROSOFT INTEGRATION / FROM PROTOTYPE TO LIVE SERVICE",
+      "text": "Agent Framework is already working here. There's also a Microsoft Foundry adapter for match explanations, though it still needs a live test. For deployment, we'd use Azure Container Apps to host the service, Web PubSub to share updates, Application Insights to monitor performance, and Key Vault for secrets. That's the proposed next step.",
+      "start": 65.468,
+      "end": 85.78
+    }
+  ]
+}

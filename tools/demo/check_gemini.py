@@ -2,12 +2,16 @@
 
 import asyncio
 import json
+import os
 from pathlib import Path
 
 from playwright.async_api import async_playwright
 
+OUT = Path(os.environ.get("TOUCHLINE_DEMO_OUT", "artifacts/demo"))
+
 
 async def main():
+    OUT.mkdir(parents=True, exist_ok=True)
     async with async_playwright() as p:
         browser = await p.chromium.launch(
             executable_path="/usr/bin/google-chrome-stable", args=["--no-sandbox"]
@@ -27,8 +31,8 @@ async def main():
             await page.locator("[data-question]").first.click(force=True)
         response = await pending.value
         result = {"status": response.status, "body": await response.json()}
-        Path("artifacts/demo-american/gemini-check.json").write_text(json.dumps(result, indent=2))
-        await page.screenshot(path="artifacts/demo-american/gemini-check.png")
+        (OUT / "gemini-check.json").write_text(json.dumps(result, indent=2))
+        await page.screenshot(path=str(OUT / "gemini-check.png"))
         print(json.dumps(result))
         await browser.close()
 

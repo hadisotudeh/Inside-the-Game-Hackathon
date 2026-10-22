@@ -1,5 +1,9 @@
 # Touchline demo
 
+The final recording is documented in [the demo package](../artifacts/demo/README.md).
+For synthetic judging, follow [the judge guide](judging.md) and run `pipenv run demo`.
+The instructions below describe the separate historical application.
+
 ## Run locally
 
 ```bash
@@ -68,7 +72,8 @@ synchronization to the video clock, and suitable feed/footage rights.
 
 ## Submission work still open
 
-Real Foundry verification with deployment credentials, evaluation of explanation
-quality, a public repository and accessible judge build, and a recorded demo are
-still required before presenting the project as a complete submission. No winning
+The final historical demo records a successful Gemini answer. The synthetic test
+build has separate judge instructions. Real Foundry verification, explanation
+evaluation, and the external release steps in [the submission checklist](submission.md)
+remain open. No winning
 outcome or eligibility is guaranteed by the interface or architecture.

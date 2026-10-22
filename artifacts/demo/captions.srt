@@ -1,111 +1,99 @@
 1
-00:00:00,000 --> 00:00:02,645
-A score tells you what happened.
+00:00:00,350 --> 00:00:01,876
+The score tells you what's happened.
 
 2
-00:00:02,645 --> 00:00:04,850
-It rarely tells you why.
+00:00:01,886 --> 00:00:03,924
+But who's actually creating the danger?
 
 3
-00:00:04,850 --> 00:00:09,700
-Meet Touchline: football intelligence that makes the match easier to understand.
+00:00:03,934 --> 00:00:05,462
+That's where Touchline comes in.
 
 4
-00:00:10,000 --> 00:00:15,669
-This is the working overlay, replaying a fictional match at sixty times speed.
+00:00:05,782 --> 00:00:09,796
+Think of it as a companion for fans watching live TV or a stream.
 
 5
-00:00:15,669 --> 00:00:18,722
-A fixed seed makes the events reproducible.
+00:00:09,806 --> 00:00:13,394
+Here, we're using a pitch view instead of broadcast footage.
 
 6
-00:00:18,722 --> 00:00:23,083
-Each arriving action updates the score, chance map and statistics.
+00:00:13,710 --> 00:00:19,032
+Each event tells us something: who made the pass, where a shot came from, what happened next.
 
 7
-00:00:23,083 --> 00:00:25,700
-No historical match footage is needed.
+00:00:19,042 --> 00:00:21,983
+This demo uses recorded Premier League events.
 
 8
-00:00:26,000 --> 00:00:29,259
-The shot map shows where chances came from.
+00:00:21,993 --> 00:00:24,829
+A live version would connect to a licensed feed.
 
 9
-00:00:29,259 --> 00:00:33,739
-Select a marker to inspect the player, outcome and expected goals.
+00:00:25,142 --> 00:00:26,876
+Watch the clock and the stats.
 
 10
-00:00:33,739 --> 00:00:36,998
-Here, expected goals is an illustrative synthetic estimate.
+00:00:26,886 --> 00:00:29,272
+They update as each event comes in.
 
 11
-00:00:36,998 --> 00:00:42,700
-Momentum measures attacking progression from completed passes and carries, not the probability of winning.
+00:00:29,282 --> 00:00:31,979
+We've sped up the replay so you can see it in action.
 
 12
-00:00:43,000 --> 00:00:47,419
-The passing network turns individual actions into a team picture.
+00:00:32,278 --> 00:00:33,341
+Want a closer look?
 
 13
-00:00:47,419 --> 00:00:52,281
-Larger circles show greater involvement; thicker links show more completed passes.
+00:00:33,351 --> 00:00:36,443
+Pick a shot to see who took it and how good the chance was.
 
 14
-00:00:52,281 --> 00:00:56,700
-Switch teams to explore both sides of the same match.
+00:00:36,453 --> 00:00:39,116
+The momentum chart tracks attacking moves.
 
 15
-00:00:57,000 --> 00:00:59,898
-Now ask a question in everyday language.
+00:00:39,126 --> 00:00:42,355
+And the passing network shows who's connecting with whom.
 
 16
-00:00:59,898 --> 00:01:06,108
-Microsoft Agent Framework runs two stages: collect match evidence, then generate an answer with Gemini.
+00:00:42,654 --> 00:00:44,631
+You can also ask the match a question.
 
 17
-00:01:06,108 --> 00:01:09,834
-The workflow checks event citations against the supplied context.
+00:00:44,641 --> 00:00:50,731
+Microsoft Agent Framework gathers the stats, recent events and player summaries through three tools.
 
 18
-00:01:09,834 --> 00:01:17,700
-A casual fan can ask about better chances; a more experienced viewer can explore field tilt and player involvement.
+00:00:50,741 --> 00:00:55,301
+Gemini uses that snapshot to explain what's happening, without looking ahead.
 
 19
-00:01:18,000 --> 00:01:22,425
-Every question captures the match at the current replay clock.
+00:00:55,622 --> 00:00:58,305
+Here's the answer, grounded in the match so far.
 
 20
-00:01:22,425 --> 00:01:25,522
-Future events and final results are excluded.
+00:00:58,315 --> 00:01:01,673
+It compares the chances and points to the events behind them.
 
 21
-00:01:25,522 --> 00:01:29,062
-Answers show their snapshot time, while playback continues.
+00:01:01,683 --> 00:01:05,213
+The explanation follows the replay, without looking ahead.
 
 22
-00:01:29,062 --> 00:01:33,488
-This is grounded assistance, not a guarantee of perfect interpretation.
+00:01:05,518 --> 00:01:08,004
+Agent Framework is already working here.
 
 23
-00:01:33,488 --> 00:01:35,700
-Provider errors are shown explicitly.
+00:01:08,014 --> 00:01:13,629
+There's also a Microsoft Foundry adapter for match explanations, though it still needs a live test.
 
 24
-00:01:36,000 --> 00:01:40,212
-For fans, Touchline adds context without leaving the screen.
+00:01:13,639 --> 00:01:23,398
+For deployment, we'd use Azure Container Apps to host the service, Web PubSub to share updates, Application Insights to monitor performance, and Key Vault for secrets.
 
 25
-00:01:40,212 --> 00:01:43,956
-For streaming teams, it demonstrates interactive match intelligence.
-
-26
-00:01:43,956 --> 00:01:47,700
-Production synchronization and Azure deployment remain next steps.
-
-27
-00:01:48,000 --> 00:01:51,086
-Touchline brings events, evidence and conversation together.
-
-28
-00:01:51,086 --> 00:01:57,700
-From the first pass to the final chance: see the game, and understand the story.
+00:01:23,408 --> 00:01:25,526
+That's the proposed next step.

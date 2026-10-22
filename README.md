@@ -1,5 +1,9 @@
 # Touchline
 
+[![Python checks](https://github.com/hadisotudeh/Inside-the-Game-Hackathon/actions/workflows/checks.yml/badge.svg)](https://github.com/hadisotudeh/Inside-the-Game-Hackathon/actions/workflows/checks.yml)
+
+[Watch demo on YouTube](https://youtu.be/o-lBHqRdArY) · [Download demo video](artifacts/demo/touchline-demo.mp4) · [Demo package](artifacts/demo/README.md) · [Judge testing guide](docs/judging.md) · [Submission checklist and pitch](docs/submission.md)
+
 ### See the game. Understand the story.
 
 **Touchline turns football event data into on-screen match intelligence and AI-powered explanations—designed for live TV and streaming experiences.**
@@ -20,9 +24,11 @@ The intended experience sits alongside live match footage. To avoid redistributi
 
 For this case study, Touchline uses **publicly available historical Premier League 2015/16 event data from [Hudl / StatsBomb Open Data](https://github.com/hudl/open-data)**. The recorded demo follows **Chelsea–Arsenal, September 19, 2015**. The server downloads the event file, then streams actions **one at a time, in match order**, through Server-Sent Events (SSE). The score, pitch and analytics update only as events are emitted. This demonstrates the event-processing experience; a production live feed and synchronization with broadcast footage remain future integrations.
 
-The **1:58 narrated demo** explains the live-TV concept, event data, sequential replay and AI workflow. Its local file is `artifacts/demo-real/touchline-demo-real-match.mp4`; generated video files are ignored by Git. See the [demo package and reproduction instructions](artifacts/demo-real/README.md). A public hosted video URL still needs to be added to the submission.
+The **87-second final demo** shows sequential replay, interactive analytics, and a successful real Gemini answer through Microsoft Agent Framework and all three evidence tools. It uses synthetic narration modeled on Hadi Sotudeh’s own voice, approved by Hadi for this demo, with no speech speed-up. [Download the final video](artifacts/demo/touchline-demo.mp4) or read the [demo package and reproduction instructions](artifacts/demo/README.md). The approved MP4 is included in this repository; private voice references and intermediate media are excluded.
 
-> **Data distinction:** the public application currently uses historical data. The hackathon also requires synthetic, football-realistic events; this case study alone does not meet that requirement. The repository includes a separate seeded synthetic demo build, described below.
+**[Watch the final demo on YouTube](https://youtu.be/o-lBHqRdArY).**
+
+> **For judges:** the video is a historical-data case study. Run `pipenv run demo` and open [localhost:8012/overlay](http://127.0.0.1:8012/overlay) to test the separate, labeled synthetic build. It uses fictional teams and seed 42 without downloading historical match data. See [step-by-step testing instructions](docs/judging.md).
 
 ## What you can explore
 
@@ -78,7 +84,7 @@ Each question captures the current score, match totals, passing networks and at 
 
 These controls improve traceability, but do not prove every sentence is correct. Aggregate comparisons may have no individual event citations. The prototype currently trusts the viewing client's snapshot; public deployment needs authoritative server-side match sessions.
 
-A real Gemini answer was verified during the earlier synthetic demo. The revised historical-match recording encountered **HTTP 429 quota exhaustion** and states that limitation explicitly. Provider failures are displayed as errors; no canned response is passed off as AI output. Replay and analytics continue independently of chat inference.
+The final historical-match recording captured **HTTP 200** from Gemini, reporting `Microsoft Agent Framework` and all three evidence tools. The answer compared chance quality at the 37:10 snapshot. Provider failures are displayed as errors; no canned response is passed off as AI output. Replay and analytics continue independently of chat inference.
 
 ### Optional Microsoft Foundry explanations
 
@@ -110,6 +116,8 @@ The optional Foundry path also limits work: shots trigger explanations, with one
 For an Azure pilot, [Container Apps Consumption supports scale-to-zero](https://learn.microsoft.com/azure/container-apps/plans), which could reduce idle compute usage. A live match service still needs a deliberate availability policy, shared state, and tested streaming/recovery behavior. Consumption hosting does not make model inference, data licensing or all supporting services free. No operating-cost benchmark or guaranteed free-tier availability is claimed.
 
 ## Run locally
+
+For the self-contained synthetic judge build, install dependencies as below, then run `pipenv run demo` instead of `pipenv run dev`. The synthetic overlay is on port **8012**; its replay and analytics need no data-provider credentials or network calls after installation. AI questions require a server-side Gemini key.
 
 Requires **Python 3.14**, **Pipenv**, and internet access to retrieve historical fixtures/events. Cloud credentials are optional for the core viewing experience.
 
@@ -183,26 +191,28 @@ StatsBomb xG is supplied by the dataset. xT uses the public pretrained 12×8 gri
 
 ## Hackathon alignment and remaining work
 
-The project follows the challenge's ingest → interpret → explain → render → personalize pipeline. The five judging areas below carry equal 20% weights. The [official rules](https://github.com/microsoft/insidethegamehackathon/blob/main/OFFICIAL%20RULES.md) are the authority; the event's Innovation Studio page required sign-in when checked on October 21, 2026.
+The project follows the challenge's ingest → interpret → explain → render → personalize pipeline. The five judging areas below carry equal 20% weights. The [official rules](https://github.com/microsoft/insidethegamehackathon/blob/main/OFFICIAL%20RULES.md) are the authority; see the [submission checklist](docs/submission.md) for release status and external submission steps.
 
 | Judging area | Evidence and remaining work |
 | --- | --- |
-| Technological implementation | Incremental replay/analytics and reproducible setup; richer synthetic-data generation and validation remain. |
+| Technological implementation | Incremental replay/analytics and reproducible setup; seeded synthetic possessions, rosters, completed/incomplete passes, pressure events and ball recoveries have consistency tests; statistical realism is not independently validated. |
 | Agentic design and innovation | A working evidence-to-narration workflow with three tools; broader evaluation is still needed. |
 | Real-world impact | A broadcast/streaming presentation concept; shared sessions, licensed live feeds and synchronization remain. |
 | User experience and presentation | Working overlay, interactive questions and a narrated case study; expanded audience/language modes remain. |
 | Category adherence | Match category claims to demonstrated functionality; planned Foundry/Azure services are not evidence of deployment. |
 
-**Synthetic-data work:** [app/synthetic.py](app/synthetic.py) generates seeded fictional events. A separate [synthetic demo build](tools/demo/README.md) runs that source through the same analytics and overlay. It is separate from the public application's historical fixture selector. Its heuristic xG is illustrative and football realism still needs evaluation and broader event coverage.
+**Synthetic build:** [app/synthetic.py](app/synthetic.py) generates fictional 90-minute matches with seed 42, two 11-player rosters, possession ownership, linked pass recipients, completed/incomplete passes, carries, shots, pressure and ball recoveries. Completed passes preserve the receiver as the next ball carrier within a spell. The generator feeds the same replay, analytics, passing-network and Agent Framework chat paths through `pipenv run demo`. Tests check reproducibility, event order, coordinates, rosters, pass recipients, shot probabilities, score consistency, and offline synthetic replay. The generator is deliberately simplified: attacking spells reset their starting locations, player movement between spells is not simulated, and xG is an uncalibrated heuristic. These checks establish structural consistency, not expert validation of football realism.
 
 Before submission:
 
-- Validate football-realistic synthetic data and demonstrate it in a judge-accessible build.
+- Review synthetic football realism and provide judges the documented test build.
 - Confirm category fit, registration, eligibility and third-party permissions.
 - Publish the GitHub repository and an English demo **under two minutes** on an accepted public video host.
 - Supply reproducible test instructions and keep the build accessible through judging.
 
 ## Development and project map
+
+Validation on October 22, 2026: **52 tests pass** locally. GitHub Actions runs lock verification, lint, formatting, and tests on pushes and pull requests. Check the workflow for the submitted commit; the badge above reflects GitHub status.
 
 ```bash
 pipenv run test

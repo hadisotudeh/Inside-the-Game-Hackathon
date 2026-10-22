@@ -1,9 +1,0 @@
-{
-  "duration_seconds": 118,
-  "clips": [
-    {"file":"artifacts/demo/raw/page@d7e493ee5aff04ef617e7895c7ee2b55.webm","start":0,"end":26},
-    {"file":"artifacts/demo/raw/page@086d11425a85a50a3cebe0cd7d873be4.webm","start":26,"end":43},
-    {"file":"artifacts/demo/raw/page@d7e493ee5aff04ef617e7895c7ee2b55.webm","start":43,"end":118}
-  ],
-  "note":"Two real browser takes of the same seeded replay. The first take contains a successful real Gemini response, then an explicit quota error. The second take provides a clearer selected-shot view. No AI answers are fabricated."
-}
