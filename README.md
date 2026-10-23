@@ -2,9 +2,7 @@
 
 [![Python checks](https://github.com/hadisotudeh/Inside-the-Game-Hackathon/actions/workflows/checks.yml/badge.svg)](https://github.com/hadisotudeh/Inside-the-Game-Hackathon/actions/workflows/checks.yml)
 
-[Watch the demo](https://youtu.be/Q1jKv-HsTxo) · [Download demo video](artifacts/demo/touchline-demo.mp4) · [Judge testing guide](docs/judging.md)
-
-**[Open the live Azure app — no installation](https://touchline-inside-the-game.azurewebsites.net)**
+[Watch the demo](https://youtu.be/Q1jKv-HsTxo) · [Open the Azure app](https://touchline-inside-the-game.azurewebsites.net)
 
 Choose a fixture, press **Start replay**, explore the charts, and ask the match a question.
 The app is already hosted on Azure App Service; chat uses Azure-hosted GPT-4.1 mini through Microsoft Foundry.
@@ -29,7 +27,7 @@ The intended experience sits alongside live match footage. To avoid redistributi
 
 For this case study, Touchline uses **publicly available historical Premier League 2015/16 event data from [Hudl / StatsBomb Open Data](https://github.com/hudl/open-data)**. The recorded demo follows **Chelsea–Arsenal, September 19, 2015**. The server downloads the event file, then streams actions **one at a time, in match order**, through Server-Sent Events (SSE). The score, pitch and analytics update only as events are emitted. This demonstrates the event-processing experience; a production live feed and synchronization with broadcast footage remain future integrations.
 
-The **115-second demo** follows Chelsea–Arsenal at 15× speed. It shows shot selection, the growing momentum chart, passing networks, automatic match notes, and **Ask the match**, followed by a walkthrough of the Microsoft Agent Framework workflow. The voiceover uses synthetic narration based on Hadi Sotudeh’s voice, with his permission. [Download the video](artifacts/demo/touchline-demo.mp4) or see the [recording and reproduction details](docs/demo-package/README.md).
+The **115-second demo** follows Chelsea–Arsenal at 15× speed. It shows shot selection, the growing momentum chart, passing networks, automatic match notes, and **Ask the match**, followed by a walkthrough of the Microsoft Agent Framework workflow. The voiceover uses synthetic narration based on Hadi Sotudeh’s voice, with his permission. See the [recording and reproduction details](docs/demo-package/README.md).
 
 > **For judges:** the video is a historical-data case study. Run `pipenv run demo` and open [localhost:8012/overlay](http://127.0.0.1:8012/overlay) to test the separate, labeled synthetic build. It uses fictional teams and seed 42 without downloading historical match data. See [step-by-step testing instructions](docs/judging.md).
 
