@@ -10,7 +10,9 @@ The latest demo is published on [YouTube](https://youtu.be/Q1jKv-HsTxo); use thi
 
 ## Description for the project form
 
-**Touchline: Match stats. AI insights.**
+**Touchline**
+
+Your AI football companion: live stats, match stories, and answers for fans and commentators ⚽💻
 
 Touchline helps football fans and commentators follow a match through interactive statistics and AI explanations. Shot maps, passing networks, and an attacking-threat chart update as events arrive. The default **AI interpretation timeline** adds automatic match notes; **Ask the match** answers questions using the same evidence.
 
@@ -58,10 +60,7 @@ Registration closed October 20 at noon Pacific. Judging ends November 10 at
 Iran; a timezone alone does not establish residency. Confirm eligibility directly
 with the organizer if uncertain.
 
-The strongest demonstrated Microsoft component is Agent Framework orchestration.
-Do not claim verified Foundry use or Azure deployment, or describe the two workflow
-stages as independently reasoning agents. Category selection remains an entrant
-decision against the actual implementation.
+The hosted demo uses Agent Framework orchestration and Azure-hosted GPT-4.1 mini through Microsoft Foundry. Its evidence and narration stages follow a fixed workflow. The optional shot-explanation adapter still needs a live deployment check. Select the category that fits this implementation.
 
 ## Rights review before upload
 

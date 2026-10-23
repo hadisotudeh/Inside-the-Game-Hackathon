@@ -2,10 +2,11 @@
 
 ## Product direction
 
-Let a viewer select a match and consume timestamped events as though live,
-then add explanations and personalized experiences beyond a score timeline.
-Use one normalized event contract for both synthetic events and optional
-historical development replays. Preserve source type and provenance explicitly.
+**Your AI football companion: live stats, match stories, and answers for fans and commentators ⚽💻**
+
+Touchline helps viewers follow a match through interactive charts, automatic match notes, and questions about the play so far. Fans can explore shots and passing connections; commentators can use the same evidence to explain changes in the game.
+
+The hosted demo streams historical events one at a time. A separate seeded synthetic build is available for judges. Both feed the same analytics and match explanation workflow.
 
 ## Source policy
 
@@ -13,7 +14,7 @@ historical development replays. Preserve source type and provenance explicitly.
 sections 4.1 and 4.7, require synthetic, football-realistic events. Replaying
 historical data or changing its timestamps does not make it synthetic.
 
-The proposed historical source is [Hudl / StatsBomb Open Data](https://github.com/hudl/open-data).
+The historical source is [Hudl / StatsBomb Open Data](https://github.com/hudl/open-data).
 Premier League 2015/2016 is competition `2`, season `27`:
 
 - `data/competitions.json`: competition/season catalog.
@@ -48,10 +49,12 @@ before using historical data to train or calibrate a generator.
    Its distance-based xG is illustrative; independent realism evaluation remains open.
 3. Incremental momentum, shot maps, and score updates feed the browser matchroom.
    Shot selection exposes evidence; a transparent same-browser overlay is available.
-4. Casual/analyst explanations use either clearly labeled templates or the optional
-   Foundry adapter. Live Foundry access and explanation quality still need verification.
-5. Azure hosting remains planned. See [deployment status](microsoft-deployment.md)
-   and [the demo guide](demo.md) for boundaries and submission work remaining.
+4. Automatic match notes and Ask the match use Microsoft Agent Framework to collect
+   statistics, recent events, and player summaries, then request an explanation from
+   Azure-hosted GPT-4.1 mini. Response format and event references are checked before display.
+   The separate optional shot-explanation adapter still needs a live deployment check.
+5. The demo is hosted on Azure App Service with Foundry chat configured. See
+   [deployment status](microsoft-deployment.md) and the [demo package](demo-package/README.md).
 
 Keep the initial system small. Add specialized agents only when distinct roles
 and handoffs improve the outcome; choosing the multi-agent category is optional.
