@@ -17,7 +17,7 @@ async def main():
             )
             await page.wait_for_timeout(5000)
             text = await page.locator("body").inner_text()
-            Path("artifacts/demo/event-page.txt").write_text(text)
+            Path(".demo-production/event-page.txt").write_text(text)
             print("EVENT PAGE:", text[:14000])
         except Exception as e:
             print("EVENT PAGE ERROR", str(e)[:300])
@@ -33,7 +33,7 @@ async def main():
             await page.locator("#chatReply").inner_text(),
             await page.locator("#chatStatus").inner_text(),
         )
-        await page.screenshot(path="artifacts/demo/probe.png")
+        await page.screenshot(path=".demo-production/probe.png")
         await browser.close()
 
 

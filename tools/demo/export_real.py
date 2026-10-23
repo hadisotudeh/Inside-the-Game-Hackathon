@@ -1,12 +1,12 @@
 # ruff: noqa: E501
-"""Export the historical case-study take, keeping the natural voice timing."""
+"""Export the historical case-study take, keeping the slower voice timing and visual reading holds."""
 
 import json
 import os
 import subprocess
 from pathlib import Path
 
-OUT = Path(os.environ.get("TOUCHLINE_DEMO_OUT", "artifacts/demo"))
+OUT = Path(os.environ.get("TOUCHLINE_DEMO_OUT", ".demo-production"))
 timeline = json.loads((OUT / "timeline.json").read_text())
 total = timeline["duration"]
 raw = Path((OUT / "raw-path.txt").read_text().strip())
@@ -43,7 +43,20 @@ for i, part in enumerate(timeline["chapters"][1:-1], 1):
 # Label the recorded provider outcome as an editorial annotation. This is
 # taken from the real response report, not an invented UI answer.
 request_report = json.loads((OUT / "recording-report.json").read_text())
-if not any(item["status"] == 200 for item in request_report["chat_responses"]):
+if request_report.get("momentum_metric") != "peak_xt_proxy":
+    raise RuntimeError("Record the deployed minute-based momentum chart before exporting")
+if not request_report.get("timeline_notes"):
+    raise RuntimeError("Record a real automatic interpretation before exporting")
+if request_report.get("page_errors"):
+    raise RuntimeError("Fix browser errors before exporting the demo")
+if not any(
+    item["status"] == 200
+    and item["body"].get("provider") == "Microsoft Foundry"
+    and item["body"].get("orchestrator") == "Microsoft Agent Framework"
+    and set(item["body"].get("tools_used", []))
+    == {"get_match_stats", "get_recent_events", "get_player_summary"}
+    for item in request_report["chat_responses"]
+):
     raise RuntimeError("The narration requires a recorded successful AI answer; retry later.")
 if any(item["status"] == 429 for item in request_report["chat_responses"]):
     error_start = timeline["chapters"][6]["start"] + 6
@@ -53,13 +66,14 @@ if any(item["status"] == 429 for item in request_report["chat_responses"]):
         f",drawbox=x=70:y=125:w=780:h=195:color=0x101820@0.97:t=fill:enable='{enable}'"
         f",drawtext=text='RECORDED API RESPONSE':x=100:y=151:fontsize=18:"
         f"fontcolor=0xc3f06b:enable='{enable}'"
-        f",drawtext=text='Gemini returned HTTP 429 - quota exhausted.':x=100:y=198:"
+        f",drawtext=text='Azure model returned HTTP 429 - quota exhausted.':x=100:y=198:"
         f"fontsize=27:fontcolor=white:enable='{enable}'"
         f",drawtext=text='Replay and analytics continue.':x=100:y=249:fontsize=25:"
         f"fontcolor=white:enable='{enable}'"
     )
 vf += f",fade=t=out:st={total - 0.6}:d=0.6"
-final = OUT / "touchline-demo.mp4"
+final = Path("artifacts/demo/touchline-demo.mp4")
+final.parent.mkdir(parents=True, exist_ok=True)
 subprocess.run(
     [
         "ffmpeg",
@@ -99,7 +113,7 @@ subprocess.run(
         "-metadata",
         "title=Touchline — A Premier League event-data case study",
         "-metadata",
-        "comment=Recorded from localhost:8000/overlay. Historical Chelsea v Arsenal replay. StatsBomb Open Data. Synthetic English narration at natural pace. No broadcast match footage.",
+        "comment=Recorded from https://touchline-inside-the-game.azurewebsites.net. Historical Chelsea v Arsenal replay. StatsBomb Open Data. Synthetic English narration at a pitch-preserving slower pace. No broadcast match footage.",
         "-movflags",
         "+faststart",
         str(final),

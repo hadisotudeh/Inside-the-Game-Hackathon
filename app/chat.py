@@ -1,4 +1,4 @@
-"""Gemini answers grounded in the replay snapshot supplied by the viewing client."""
+"""Model answers grounded in the replay snapshot supplied by the viewing client."""
 
 import asyncio
 import json
@@ -41,6 +41,31 @@ class MatchChat:
         self.transport = transport
 
     async def _generate(self, payload, key):
+        url = "https://generativelanguage.googleapis.com/v1beta/interactions"
+        headers = {"x-goog-api-key": key}
+        if self.settings.chat_provider == "foundry":
+            url = self.settings.foundry_endpoint.rstrip("/") + "/openai/v1/chat/completions"
+            headers = {"api-key": key}
+            payload = {
+                "model": self.settings.foundry_deployment,
+                "messages": [
+                    {"role": "system", "content": payload["system_instruction"]},
+                    {"role": "user", "content": payload["input"]},
+                ],
+                "max_completion_tokens": 600,
+                "store": False,
+                "response_format": {
+                    "type": "json_schema",
+                    "json_schema": {
+                        "name": "match_answer",
+                        "strict": True,
+                        "schema": {
+                            **payload["response_format"]["schema"],
+                            "additionalProperties": False,
+                        },
+                    },
+                },
+            }
         async with asyncio.timeout(25):
             async with httpx.AsyncClient(
                 timeout=httpx.Timeout(12, connect=5), transport=self.transport
@@ -48,8 +73,8 @@ class MatchChat:
                 for attempt in range(3):
                     try:
                         response = await client.post(
-                            "https://generativelanguage.googleapis.com/v1beta/interactions",
-                            headers={"x-goog-api-key": key},
+                            url,
+                            headers=headers,
                             json=payload,
                         )
                     except httpx.TransportError:
@@ -67,11 +92,12 @@ class MatchChat:
         return await run_match_workflow(request.model_dump(), generate)
 
     async def _answer(self, request: ChatRequest):
-        key = self.settings.gemini_api_key.get_secret_value()
+        azure = self.settings.chat_provider == "foundry"
+        key = (
+            self.settings.foundry_api_key if azure else self.settings.gemini_api_key
+        ).get_secret_value()
         if not key:
-            raise HTTPException(
-                503, "Set GAME_GEMINI_API_KEY in the server .env file to enable chat."
-            )
+            raise HTTPException(503, "Configure server-side model credentials to enable chat.")
         instructions = (
             "You are Touchline's football analyst. Answer ONLY from the supplied replay snapshot. "
             "Never use historical match knowledge, final results or events beyond the "
@@ -83,11 +109,10 @@ class MatchChat:
             "Explain uncertainty: event positions are not continuous tracking; possession is "
             "estimated; "
             "field tilt is share of completed passes starting in the attacking third; "
-            "momentum shows each action’s attacking progression, "
-            "without accumulation or time decay; it is "
-            "an xT proxy, not a scoring probability. The chart shows home minus away momentum; "
-            "backward moves can shift the "
-            "difference toward the opponent without an opponent action. "
+            "momentum is a recency-weighted comparison of each team's highest location xT "
+            "per minute over the last four minutes, capped at 0.1 per team-minute; "
+            "home minus away, resetting each period. It is a proxy, not scoring probability "
+            "or FotMob's proprietary metric. Missing or incomplete momentum is unknown. "
             "Stats are match totals so far; events "
             "contain ONLY "
             "a recent excerpt, so do not assume omitted events never happened. Do not invent "
@@ -134,25 +159,33 @@ class MatchChat:
         try:
             response = await self._generate(payload, key)
             if response.status_code == 400:
-                logger.warning("Gemini rejected request configuration (HTTP 400)")
+                logger.warning("The model rejected request configuration (HTTP 400)")
                 raise HTTPException(
-                    502, "Gemini rejected the request settings. Check the model configuration."
+                    502, "The model rejected the request settings. Check the model configuration."
                 )
             if response.status_code in {401, 403}:
                 raise HTTPException(
                     503,
-                    "Gemini rejected the API key or model access. Check the server configuration.",
+                    "The model rejected the API key or model access. "
+                    "Check the server configuration.",
                 )
             if response.status_code == 404:
                 raise HTTPException(
-                    503, "The configured Gemini model is unavailable. Check GAME_GEMINI_MODEL."
+                    503,
+                    "The configured model deployment is unavailable. "
+                    "Check the server model configuration.",
                 )
             if response.status_code == 429:
                 raise HTTPException(
-                    429, "Gemini's free-tier quota is temporarily exhausted. Try again later."
+                    429, "The model's request quota is temporarily exhausted. Try again later."
                 )
             response.raise_for_status()
             data = response.json()
+            if azure:
+                choice = data["choices"][0]
+                if choice["finish_reason"] != "stop" or choice["message"].get("refusal"):
+                    raise ValueError("Incomplete or refused model output")
+                data = {"outputs": [{"type": "text", "text": choice["message"]["content"]}]}
             if data.get("status") not in {None, "completed"}:
                 raise ValueError("Incomplete response")
             blocks = [
@@ -178,7 +211,8 @@ class MatchChat:
                 raise ValueError("Unsupported event citation")
             return {
                 **answer.model_dump(),
-                "provider": "Gemini",
+                "provider": "Microsoft Foundry" if azure else "Gemini",
+                "deployment": self.settings.foundry_deployment if azure else None,
                 "mode": request.mode,
                 "as_of": request.snapshot.get("clock"),
                 "evidence": [
@@ -186,20 +220,22 @@ class MatchChat:
                 ],
             }
         except TimeoutError, httpx.TimeoutException:
-            raise HTTPException(504, "Gemini took too long to answer. Please try again.") from None
-        except httpx.HTTPStatusError as error:
-            logger.warning("Gemini returned HTTP %d after retries", error.response.status_code)
             raise HTTPException(
-                502, "Gemini is temporarily unavailable after retries. Please try again."
+                504, "The model took too long to answer. Please try again."
+            ) from None
+        except httpx.HTTPStatusError as error:
+            logger.warning("The model returned HTTP %d after retries", error.response.status_code)
+            raise HTTPException(
+                502, "The model is temporarily unavailable after retries. Please try again."
             ) from None
         except httpx.RequestError as error:
-            logger.warning("Gemini connection failed after retries: %s", type(error).__name__)
+            logger.warning("The model connection failed after retries: %s", type(error).__name__)
             raise HTTPException(
                 502,
-                "The server could not connect to Gemini after retries. "
+                "The server could not connect to the model provider after retries. "
                 "Check the server’s internet or proxy connection.",
             ) from None
-        except ValueError, KeyError, TypeError:
+        except ValueError, KeyError, TypeError, IndexError:
             raise HTTPException(
-                502, "Gemini returned an unsupported answer. Please try again."
+                502, "The model returned an unsupported answer. Please try again."
             ) from None

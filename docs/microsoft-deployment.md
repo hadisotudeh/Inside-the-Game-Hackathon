@@ -8,7 +8,13 @@ The final 87-second historical-match recording captured a real Gemini HTTP 200
 answer through all three evidence tools on October 22, 2026. This is Microsoft orchestration
 with a Google model, not Microsoft-hosted inference.
 
-No Azure resources are provisioned. The separate Microsoft Foundry Azure OpenAI
+The application was deployed to **Azure App Service LinuxFree** in Sweden Central
+on October 23, 2026 using an Azure for Students subscription.
+See the [live overlay](https://touchline-inside-the-game.azurewebsites.net) and
+[deployment details](azure-free.md). The live chat now uses Azure-hosted GPT-4.1 mini
+through Microsoft Foundry, with credentials stored in Azure application settings.
+The Gemini recording above describes the earlier development demo.
+The separate Microsoft Foundry Azure OpenAI
 v1 adapter has mocked HTTP tests but still needs a real deployment smoke check.
 Template explanations make no model calls. The repository's GitHub Actions
 workflow does not establish successful CI or Azure deployment.

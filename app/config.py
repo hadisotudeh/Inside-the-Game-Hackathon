@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="GAME_", env_file=".env", extra="ignore")
 
     app_name: str = "Inside the Game"
+    chat_provider: Literal["gemini", "foundry"] = "gemini"
     gemini_api_key: SecretStr = SecretStr("")
     gemini_model: str = "gemini-3.8-flash"
     explanation_provider: Literal["off", "template", "foundry"] = "template"
@@ -23,7 +24,7 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_foundry(self):
-        if self.explanation_provider == "foundry":
+        if self.explanation_provider == "foundry" or self.chat_provider == "foundry":
             endpoint = urlsplit(self.foundry_endpoint)
             if (
                 endpoint.scheme != "https"

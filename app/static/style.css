@@ -783,3 +783,22 @@ dialog>div { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24
   overflow-y: auto;
   overflow-wrap: anywhere;
 }
+
+.developer-credit { white-space: nowrap; color: #52606d; }
+.developer-credit a { color: #126347; text-decoration: underline; text-underline-offset: 3px; }
+
+.intelligence-view { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+#commentary .chat-controls { flex-shrink: 0; margin-bottom: 10px; }
+#intelligenceMode { min-width: 0; width: 100%; max-width: 100%; }
+.ai-timeline { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: thin; }
+.ai-note { padding: 12px 0; margin: 0 16px; border-bottom: 1px solid var(--line); }
+.ai-note time { font-weight: 650; color: #126347; }
+.ai-note p { margin: 7px 0; font-size: 14px; line-height: 1.5; }
+.ai-note small { color: var(--muted); font-size: 11px; }
+.broadcast-overlay .ai-note p { font-size: 17px; }
+.broadcast-overlay .ai-note time, .broadcast-overlay .chat-controls { font-size: 15px; }
+.broadcast-overlay #intelligenceMode { font-size: 15px; min-height: 36px; }
+.broadcast-overlay .ai-note small { font-size: 13px; }
+
+#momentumAxis { display: block; position: relative; height: 20px; }
+#momentumAxis span { position: absolute; top: 0; }

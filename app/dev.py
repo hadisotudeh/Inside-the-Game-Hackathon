@@ -24,14 +24,14 @@ def open_when_ready(stopped: threading.Event) -> None:
             ready = False
         if ready and not stopped.is_set():
             try:
-                if not webbrowser.open_new_tab(f"{URL}/overlay"):
-                    logger.warning("Could not open a browser. Open %s/overlay manually.", URL)
+                if not webbrowser.open_new_tab(f"{URL}/"):
+                    logger.warning("Could not open a browser. Open %s/ manually.", URL)
             except webbrowser.Error:
-                logger.warning("Could not open a browser. Open %s/overlay manually.", URL)
+                logger.warning("Could not open a browser. Open %s/ manually.", URL)
             return
         stopped.wait(0.25)
     if not stopped.is_set():
-        logger.warning("Browser launch timed out. Open %s/overlay when ready.", URL)
+        logger.warning("Browser launch timed out. Open %s/ when ready.", URL)
 
 
 def main() -> None:

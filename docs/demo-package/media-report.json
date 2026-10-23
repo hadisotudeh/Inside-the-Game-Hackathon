@@ -26,13 +26,13 @@
       "r_frame_rate": "30/1",
       "avg_frame_rate": "30/1",
       "time_base": "1/15360",
-      "start_pts": 512,
-      "start_time": "0.033333",
-      "duration_ts": 1335296,
-      "duration": "86.933333",
-      "bit_rate": "1164543",
+      "start_pts": 0,
+      "start_time": "0.000000",
+      "duration_ts": 1761280,
+      "duration": "114.666667",
+      "bit_rate": "807895",
       "bits_per_raw_sample": "8",
-      "nb_frames": "2608",
+      "nb_frames": "3440",
       "extradata_size": 49,
       "disposition": {
         "default": 1,
@@ -82,10 +82,10 @@
       "time_base": "1/48000",
       "start_pts": 0,
       "start_time": "0.000000",
-      "duration_ts": 4175040,
-      "duration": "86.980000",
-      "bit_rate": "145447",
-      "nb_frames": "4079",
+      "duration_ts": 5503474,
+      "duration": "114.655708",
+      "bit_rate": "145266",
+      "nb_frames": "5376",
       "extradata_size": 5,
       "disposition": {
         "default": 1,
@@ -109,7 +109,7 @@
         "multilayer": 0
       },
       "tags": {
-        "language": "eng",
+        "language": "und",
         "handler_name": "SoundHandler"
       }
     }
@@ -122,9 +122,9 @@
     "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
     "format_long_name": "QuickTime / MOV",
     "start_time": "0.000000",
-    "duration": "86.980000",
-    "size": "14333581",
-    "bit_rate": "1318333",
+    "duration": "114.666667",
+    "size": "13789910",
+    "bit_rate": "962086",
     "probe_score": 100,
     "tags": {
       "major_brand": "isom",
@@ -132,7 +132,15 @@
       "compatible_brands": "isomiso2avc1mp41",
       "title": "Touchline \u2014 A Premier League event-data case study",
       "encoder": "Lavf63.1.101",
-      "comment": "Synthetic narration conditioned on the owner's supplied voice sample."
+      "comment": "Recorded from https://touchline-inside-the-game.azurewebsites.net. Historical Chelsea v Arsenal replay. StatsBomb Open Data. Synthetic English narration at a pitch-preserving slower pace. No broadcast match footage."
     }
-  }
+  },
+  "video_sha256": "f4ff99d40bfea8a89e8e634548a27d024b6e59069dd1cc5b3747a861c73260d6",
+  "source_url": "https://touchline-inside-the-game.azurewebsites.net",
+  "narration_tempo_factor": 0.88,
+  "pitch_preserving": true,
+  "visual_reading_holds_seconds": 10,
+  "architecture_walkthrough_seconds": 27.61,
+  "architecture_diagram_highlights": true,
+  "full_decode_passed": true
 }

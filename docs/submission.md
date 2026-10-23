@@ -5,27 +5,22 @@ Repository: <https://github.com/hadisotudeh/Inside-the-Game-Hackathon>
 **Status: repository prepared locally; external submission steps remain.**
 The GitHub API confirmed the repository is public on October 22, 2026;
 the changes in this package still need to be pushed.
-YouTube video URL: <https://youtu.be/o-lBHqRdArY>. Add this link to the hackathon
-project form.
+Live application: <https://touchline-inside-the-game.azurewebsites.net>.
+The latest demo is published on [YouTube](https://youtu.be/Q1jKv-HsTxo); use this URL in the project form.
 
-## Pitch for the project form
+## Description for the project form
 
-Touchline helps football fans understand the story behind the score. It turns
-timestamped events into an interactive broadcast-style companion: chance quality,
-attacking momentum, passing connections and questions about the match so far.
+**Touchline: Match stats. AI insights.**
 
-Microsoft Agent Framework coordinates three evidence tools and a narrator stage.
-Gemini explains the captured match state, with schema checks, citation validation
-and a visible snapshot time. A separate synthetic build creates seeded fictional
-matches locally; the recorded case study demonstrates the same interface on
-historical Chelsea–Arsenal events. Questions, team selection and shot exploration
-let viewers investigate what interests them.
+Touchline helps football fans and commentators follow a match through interactive statistics and AI explanations. Shot maps, passing networks, and an attacking-threat chart update as events arrive. The default **AI interpretation timeline** adds automatic match notes; **Ask the match** answers questions using the same evidence.
 
-The application is a working local prototype. Agent Framework and real Gemini
-inference are demonstrated. A Microsoft Foundry explanation adapter is implemented
-but awaits live verification. Azure Container Apps, Web PubSub, Application Insights
-and Key Vault are proposed deployment integrations. Production live feeds, broadcast
-synchronization and independent evaluation of synthetic realism remain future work.
+Built with **Python/FastAPI**, **Microsoft Agent Framework**, and **Azure-hosted GPT-4.1 mini through Microsoft Foundry**, Touchline gathers match statistics, recent events, and player summaries through three tools. The server checks the response format and cited event references before displaying explanations.
+
+**Already live on Azure App Service**, the app simulates live play by streaming a historical Chelsea–Arsenal match from [Hudl/StatsBomb Open Data](https://github.com/hudl/open-data) one event at a time. A separate synthetic build generates seeded fictional matches. Production live feeds and broadcast synchronization remain future work.
+
+Developed by **[Hadi Sotudeh](https://www.linkedin.com/in/hadisotudeh)** for the **Microsoft × Premier League Inside the Game Developer Hackathon**.
+
+[Watch the demo](https://youtu.be/Q1jKv-HsTxo) · [Try Touchline](https://touchline-inside-the-game.azurewebsites.net) · [GitHub and setup](https://github.com/hadisotudeh/Inside-the-Game-Hackathon)
 
 ## Evidence supplied
 
@@ -33,9 +28,9 @@ synchronization and independent evaluation of synthetic realism remain future wo
 | --- | --- |
 | Working code and dependency lock | Root application, Pipfile and Pipfile.lock |
 | Judge setup and synthetic build | [Testing guide](judging.md); `pipenv run demo` |
-| Final English video | [Approved demo](../artifacts/demo/touchline-demo.mp4), 86.98 seconds, 1080p; owner-reference synthetic narration |
-| Video transcript and captions | [Demo package](../artifacts/demo/README.md) |
-| Live integration evidence | Final recording: Gemini HTTP 200, Agent Framework, three evidence tools |
+| Final English video | [Approved demo](../artifacts/demo/touchline-demo.mp4), 114.67 seconds, 1080p; owner-reference synthetic narration |
+| Video transcript and captions | [Demo package](demo-package/README.md) |
+| Live integration evidence | Hosted app and updated recording: Foundry HTTP 200, Agent Framework, three evidence tools |
 | Architecture and service status | [README](../README.md), [Microsoft plan](microsoft-deployment.md) |
 | Source and asset provenance | [Credits](assets.md), [xT model](xt-model.md), [MIT code license](../LICENSE) |
 
@@ -50,7 +45,7 @@ were checked October 22, 2026; they control eligibility and acceptance.
   Historical footage alone is not the synthetic-data demonstration.
 - [ ] Push the reviewed changes and verify the repository is public without login.
 - [ ] Confirm GitHub Actions is green for the exact submitted commit.
-- [x] Upload the final video to an accepted host: [YouTube demo](https://youtu.be/o-lBHqRdArY).
+- [x] Publish the updated Azure demo on [YouTube](https://youtu.be/Q1jKv-HsTxo).
 - [ ] Confirm the video is viewable without login and add its URL to the project
   form. The video must stay under two minutes (4.4).
 - [ ] Provide the test-build link and [testing instructions](judging.md), with

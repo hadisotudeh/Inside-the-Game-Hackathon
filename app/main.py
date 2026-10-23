@@ -5,7 +5,7 @@ from typing import Annotated
 
 import httpx
 from fastapi import FastAPI, HTTPException, Query, Request
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.chat import ChatRequest, MatchChat
@@ -26,11 +26,15 @@ def create_app() -> FastAPI:
 
     @application.get("/", include_in_schema=False)
     async def home():
+        return FileResponse(static / "overlay.html")
+
+    @application.get("/matchroom", include_in_schema=False)
+    async def matchroom():
         return FileResponse(static / "index.html")
 
     @application.get("/overlay", include_in_schema=False)
     async def overlay():
-        return FileResponse(static / "overlay.html")
+        return RedirectResponse("/", status_code=308)
 
     @application.post("/chat", tags=["match intelligence"])
     async def chat(payload: ChatRequest):

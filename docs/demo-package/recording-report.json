@@ -1,0 +1,237 @@
+{
+  "url": "https://touchline-inside-the-game.azurewebsites.net",
+  "live_url_navigation": true,
+  "intelligence_modes": [
+    "ask",
+    "timeline"
+  ],
+  "default_intelligence_mode": "timeline",
+  "momentum_metric": "peak_xt_proxy",
+  "timeline_notes": 3,
+  "match_id": 3754217,
+  "match": "Chelsea v Arsenal, 19 September 2015",
+  "source": "StatsBomb historical open data",
+  "speed": 15,
+  "page_errors": [],
+  "chat_responses": [
+    {
+      "status": 200,
+      "body": {
+        "text": "Chelsea shows early control with 74% possession and higher pass accuracy (82% vs 50%), indicating stronger ball retention in the first minute. Their passing network is active, especially involving Fabregas and Zouma. Momentum slightly favors Chelsea but is very close. No shots or final-third passes yet, so offensive threat level remains unclear at this stage.",
+        "evidence_event_ids": [
+          "3480d3a6-287b-4264-b062-92b2b8036d93",
+          "30cdca2e-1b9e-476f-96b3-1b0d30763cfe",
+          "6acbcccd-530d-4859-a94d-fcf3679fcb42"
+        ],
+        "provider": "Microsoft Foundry",
+        "deployment": "touchline-chat",
+        "mode": "simple",
+        "as_of": {
+          "minute": 1,
+          "second": 0,
+          "period": 1
+        },
+        "evidence": [
+          {
+            "id": "3480d3a6-287b-4264-b062-92b2b8036d93",
+            "minute": 0,
+            "second": 59,
+            "period": 1,
+            "team": "Chelsea",
+            "team_id": 33,
+            "action": "Pass \u00b7 Completed",
+            "description": "Francesc F\u00e0bregas i Soler \u2192 Oscar dos Santos Emboaba J\u00fanior"
+          },
+          {
+            "id": "30cdca2e-1b9e-476f-96b3-1b0d30763cfe",
+            "minute": 0,
+            "second": 58,
+            "period": 1,
+            "team": "Chelsea",
+            "team_id": 33,
+            "action": "Carry",
+            "description": "Francesc F\u00e0bregas i Soler"
+          },
+          {
+            "id": "6acbcccd-530d-4859-a94d-fcf3679fcb42",
+            "minute": 0,
+            "second": 58,
+            "period": 1,
+            "team": "Chelsea",
+            "team_id": 33,
+            "action": "Ball Recovery",
+            "description": "Francesc F\u00e0bregas i Soler"
+          }
+        ],
+        "orchestrator": "Microsoft Agent Framework",
+        "tools_used": [
+          "get_match_stats",
+          "get_recent_events",
+          "get_player_summary"
+        ]
+      }
+    },
+    {
+      "status": 200,
+      "body": {
+        "text": "Chelsea leads possession and completed passes prominently, showing more control with 58% ball time and 76% pass accuracy, including better presence in Arsenal's final third. They have also registered the only shot on target so far, indicating early attacking intent. Momentum is slightly in Chelsea's favor, but the score remains 0-0, and the pattern is early dominance without breakthrough, with limited uncertainty due to short elapsed time.",
+        "evidence_event_ids": [
+          "94c49d0f-5fa9-4160-8449-1127b6370f33"
+        ],
+        "provider": "Microsoft Foundry",
+        "deployment": "touchline-chat",
+        "mode": "simple",
+        "as_of": {
+          "minute": 6,
+          "second": 2,
+          "period": 1
+        },
+        "evidence": [
+          {
+            "id": "94c49d0f-5fa9-4160-8449-1127b6370f33",
+            "minute": 5,
+            "second": 57,
+            "period": 1,
+            "team": "Chelsea",
+            "team_id": 33,
+            "action": "Shot \u00b7 Saved",
+            "description": "Francesc F\u00e0bregas i Soler"
+          }
+        ],
+        "orchestrator": "Microsoft Agent Framework",
+        "tools_used": [
+          "get_match_stats",
+          "get_recent_events",
+          "get_player_summary"
+        ]
+      }
+    },
+    {
+      "status": 200,
+      "body": {
+        "text": "By 11 minutes, Arsenal leads in possession (62%) and completed passes (55 vs. 40). Arsenal also shows a higher field tilt (56%) meaning more play in Chelsea's attacking third and slightly better pass accuracy. Chelsea has slightly more tackles but fewer chances (equal shots, no clear advantage). Arsenal's recent ball recoveries suggest growing control. These patterns suggest Arsenal is more dominant early on, but momentum remains close, so the game is still open.",
+        "evidence_event_ids": [
+          "84bd772e-7db0-4b90-b816-94d8fb75df4e",
+          "9fcbec8d-bdf9-45e9-854c-2c3639863ce5",
+          "f6a69235-591c-4979-8352-e48bdb4537f8"
+        ],
+        "provider": "Microsoft Foundry",
+        "deployment": "touchline-chat",
+        "mode": "simple",
+        "as_of": {
+          "minute": 11,
+          "second": 3,
+          "period": 1
+        },
+        "evidence": [
+          {
+            "id": "84bd772e-7db0-4b90-b816-94d8fb75df4e",
+            "minute": 11,
+            "second": 1,
+            "period": 1,
+            "team": "Arsenal",
+            "team_id": 1,
+            "action": "Carry",
+            "description": "Santiago Cazorla Gonz\u00e1lez"
+          },
+          {
+            "id": "9fcbec8d-bdf9-45e9-854c-2c3639863ce5",
+            "minute": 11,
+            "second": 1,
+            "period": 1,
+            "team": "Arsenal",
+            "team_id": 1,
+            "action": "Ball Recovery",
+            "description": "Santiago Cazorla Gonz\u00e1lez"
+          },
+          {
+            "id": "f6a69235-591c-4979-8352-e48bdb4537f8",
+            "minute": 10,
+            "second": 59,
+            "period": 1,
+            "team": "Chelsea",
+            "team_id": 33,
+            "action": "Foul Committed",
+            "description": "Oscar dos Santos Emboaba J\u00fanior"
+          }
+        ],
+        "orchestrator": "Microsoft Agent Framework",
+        "tools_used": [
+          "get_match_stats",
+          "get_recent_events",
+          "get_player_summary"
+        ]
+      }
+    },
+    {
+      "status": 200,
+      "body": {
+        "text": "Arsenal has created better chances so far, with more shots (2 vs 1) and higher expected goals (0.0455 vs 0.0315). They also have more final-third passes (10 vs 7) and greater possession (65% vs 35%). Chelsea has one shot on target but Arsenal shows more attacking activity overall.",
+        "evidence_event_ids": [
+          "06f54bc7-10fd-4e08-b525-adb6d7bae3b4"
+        ],
+        "provider": "Microsoft Foundry",
+        "deployment": "touchline-chat",
+        "mode": "simple",
+        "as_of": {
+          "minute": 12,
+          "second": 48,
+          "period": 1
+        },
+        "evidence": [
+          {
+            "id": "06f54bc7-10fd-4e08-b525-adb6d7bae3b4",
+            "minute": 11,
+            "second": 17,
+            "period": 1,
+            "team": "Arsenal",
+            "team_id": 1,
+            "action": "Shot \u00b7 Off T",
+            "description": "Alexis Alejandro S\u00e1nchez S\u00e1nchez"
+          }
+        ],
+        "orchestrator": "Microsoft Agent Framework",
+        "tools_used": [
+          "get_match_stats",
+          "get_recent_events",
+          "get_player_summary"
+        ]
+      }
+    }
+  ],
+  "clock_samples": [
+    {
+      "chapter": 1,
+      "clock": "00:00"
+    },
+    {
+      "chapter": 2,
+      "clock": "01:20"
+    },
+    {
+      "chapter": 3,
+      "clock": "05:08"
+    },
+    {
+      "chapter": 4,
+      "clock": "06:57"
+    },
+    {
+      "chapter": 5,
+      "clock": "10:19"
+    },
+    {
+      "chapter": 6,
+      "clock": "12:48"
+    },
+    {
+      "chapter": 7,
+      "clock": "15:58"
+    },
+    {
+      "chapter": 8,
+      "clock": "22:42"
+    }
+  ],
+  "duration_seconds": 114.6557
+}

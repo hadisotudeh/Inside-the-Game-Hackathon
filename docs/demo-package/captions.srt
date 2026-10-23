@@ -1,0 +1,107 @@
+1
+00:00:00,760 --> 00:00:05,740
+Touchline helps football fans and commentators follow a match with statistics and AI explanations.
+
+2
+00:00:06,693 --> 00:00:09,227
+Open this Azure address to try it yourself.
+
+3
+00:00:09,237 --> 00:00:10,765
+No installation is needed.
+
+4
+00:00:10,775 --> 00:00:14,493
+The pitch shows recorded actions in place of broadcast footage.
+
+5
+00:00:15,338 --> 00:00:21,140
+We use event data: individual passes, shots, and other actions, each with a time, player, and location.
+
+6
+00:00:21,150 --> 00:00:26,726
+This historical Chelsea against Arsenal match simulates live play by streaming one event at a time.
+
+7
+00:00:26,736 --> 00:00:29,548
+Charts and AI use only the events revealed so far.
+
+8
+00:00:30,372 --> 00:00:33,198
+At fifteen times speed, match evidence builds quickly.
+
+9
+00:00:33,208 --> 00:00:36,822
+Watch the clock, statistics, and charts update as each event arrives.
+
+10
+00:00:37,643 --> 00:00:39,774
+Select a shot to inspect the chance.
+
+11
+00:00:39,784 --> 00:00:44,772
+The momentum chart compares recent attacking threat, using an expected threat proxy.
+
+12
+00:00:44,782 --> 00:00:46,795
+Its timeline grows with the match.
+
+13
+00:00:46,805 --> 00:00:49,413
+Passing networks show which players connect.
+
+14
+00:00:51,162 --> 00:00:54,115
+Narration adds short, timestamped match notes automatically.
+
+15
+00:00:54,125 --> 00:00:58,312
+It follows the evidence as play develops, so you can watch without typing a question.
+
+16
+00:01:01,069 --> 00:01:05,905
+Switch to Ask the match for a specific question: who has created the better chances?
+
+17
+00:01:05,915 --> 00:01:08,154
+Answers use the current match snapshot.
+
+18
+00:01:08,164 --> 00:01:11,039
+Switching modes keeps your notes and conversation.
+
+19
+00:01:13,718 --> 00:01:16,357
+Historical events enter FastAPI one at a time.
+
+20
+00:01:16,367 --> 00:01:20,042
+Its analytics update browser charts through a live event stream.
+
+21
+00:01:20,052 --> 00:01:27,354
+For narration and questions, Microsoft Agent Framework runs three tools: match statistics, recent events, and player summaries.
+
+22
+00:01:27,364 --> 00:01:30,406
+Azure GPT four point one mini explains that evidence.
+
+23
+00:01:30,416 --> 00:01:35,588
+The server checks the answer format and event references before sending it to the browser.
+
+24
+00:01:41,061 --> 00:01:47,230
+Try the live app: choose a fixture, start a replay, and explore both AI modes.
+
+25
+00:01:47,240 --> 00:01:49,289
+Developed by Hadi Sotudeh.
+
+26
+00:01:49,299 --> 00:01:51,824
+For more, follow me on LinkedIn.
+
+27
+00:01:51,834 --> 00:01:52,141
+Bye.

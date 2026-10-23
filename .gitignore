@@ -237,19 +237,9 @@ __marimo__/
 Thumbs.db
 .vscode
 
-# Keep demo tools, scripts and assets available for README links and reproduction.
-# Ignore generated demo output, but retain package documentation and captions.
-/artifacts/*
-!/artifacts/*/
-/artifacts/*/*
-!/artifacts/*/README.md
-!/artifacts/*/*.srt
-
-# Keep only the approved demo and reviewable evidence; production inputs stay local.
-!/artifacts/demo/narration.txt
-!/artifacts/demo/timeline.json
-!/artifacts/demo/recording-report.json
-
+# Keep the final demo and opening slide; production inputs stay local.
+/artifacts/**
+!/artifacts/demo/
 !/artifacts/demo/touchline-demo.mp4
-!/artifacts/demo/narration-report.json
-!/artifacts/demo/media-report.json
+!/artifacts/demo/touchline-opening-slide.jpg
+/.demo-production/

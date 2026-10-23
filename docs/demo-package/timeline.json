@@ -1,0 +1,59 @@
+{
+  "duration": 114.6557,
+  "chapters": [
+    {
+      "label": "MATCH STATS AND AI / FOR FANS AND COMMENTATORS",
+      "text": "Touchline helps football fans and commentators follow a match with statistics and AI explanations.",
+      "start": 0.25,
+      "end": 6.1329
+    },
+    {
+      "label": "OPEN THE LIVE AZURE DEMO / NO INSTALLATION",
+      "text": "Open this Azure address to try it yourself. No installation is needed. The pitch shows recorded actions in place of broadcast footage.",
+      "start": 6.1329,
+      "end": 14.8376
+    },
+    {
+      "label": "WHAT IS FOOTBALL EVENT DATA?",
+      "text": "We use event data: individual passes, shots, and other actions, each with a time, player, and location. This historical Chelsea against Arsenal match simulates live play by streaming one event at a time. Charts and AI use only the events revealed so far.",
+      "start": 14.8376,
+      "end": 29.9017
+    },
+    {
+      "label": "REAL-TIME FAN EXPERIENCE / EVENT REPLAY",
+      "text": "At fifteen times speed, match evidence builds quickly. Watch the clock, statistics, and charts update as each event arrives.",
+      "start": 29.9017,
+      "end": 37.2326
+    },
+    {
+      "label": "EXPLORE THE MATCH / SHOTS, MOMENTUM, PASSING",
+      "text": "Select a shot to inspect the chance. The momentum chart compares recent attacking threat, using an expected threat proxy. Its timeline grows with the match. Passing networks show which players connect.",
+      "start": 37.2326,
+      "end": 50.662
+    },
+    {
+      "label": "AUTOMATIC NARRATION / THE MATCH STORY",
+      "text": "Narration adds short, timestamped match notes automatically. It follows the evidence as play develops, so you can watch without typing a question.",
+      "start": 50.662,
+      "end": 60.6387
+    },
+    {
+      "label": "ASK THE MATCH / QUESTIONS WITH EVIDENCE",
+      "text": "Switch to Ask the match for a specific question: who has created the better chances? Answers use the current match snapshot. Switching modes keeps your notes and conversation.",
+      "start": 60.6388,
+      "end": 73.338
+    },
+    {
+      "label": "APP ARCHITECTURE / EVENTS TO AI INSIGHTS",
+      "text": "Historical events enter FastAPI one at a time. Its analytics update browser charts through a live event stream. For narration and questions, Microsoft Agent Framework runs three tools: match statistics, recent events, and player summaries. Azure GPT four point one mini explains that evidence. The server checks the answer format and event references before sending it to the browser.",
+      "start": 73.338,
+      "end": 100.9508
+    },
+    {
+      "label": "ALREADY LIVE ON AZURE / TRY TOUCHLINE YOURSELF",
+      "text": "Try the live app: choose a fixture, start a replay, and explore both AI modes. Developed by Hadi Sotudeh. For more, follow me on LinkedIn. Bye.",
+      "start": 100.9508,
+      "end": 112.6557
+    }
+  ]
+}

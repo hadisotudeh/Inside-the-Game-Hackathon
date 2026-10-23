@@ -29,10 +29,12 @@ def test_incremental_shots_duplicates_and_period_reset():
     state = MatchAnalytics(1, 2)
     first = state.consume(event("1"))
     assert first["shot_summary"]["1"] == {"shots": 1, "xg": 0.2}
-    assert first["momentum"]["net_difference"] == 0
+    assert first["momentum"]["net_difference"] == pytest.approx(0.1)
     assert state.consume(event("1"))["shot_added"] is None
     state.consume(event("2", kind="Carry", carry={"end_location": [115, 40]}))
-    assert state.consume(event("3", second=30, kind="Pressure"))["momentum"]["home"] == 0
+    assert state.consume(event("3", second=30, kind="Pressure"))["momentum"][
+        "home"
+    ] == pytest.approx(0.1)
     reset = state.consume(event("4", period=2, kind="Half Start"))
     assert reset["momentum"]["home"] == 0
     assert reset["shot_summary"]["1"]["shots"] == 1
@@ -82,13 +84,15 @@ def test_xt_signed_actions_and_missing_coordinates():
     state = MatchAnalytics(1, 2)
     move = event("1", kind="Carry", carry={"end_location": [115, 40]})
     result = state.consume(move)
-    assert result["momentum"]["home"] == pytest.approx(0.1494026)
+    assert result["momentum"]["home"] == pytest.approx(0.1)
+    assert result["momentum"]["action_value"] == pytest.approx(0.1494026)
     assert state.consume(move)["momentum"]["period_observations"]["1"] == 1
     result = state.consume(
         event("2", team=2, kind="Carry", location=[115, 40], carry={"end_location": [100, 40]})
     )
-    assert result["momentum"]["away"] == pytest.approx(-0.1494026)
-    assert result["momentum"]["net_difference"] == pytest.approx(0.1494026)
+    assert result["momentum"]["away"] == pytest.approx(0.1)
+    assert result["momentum"]["action_value"] == pytest.approx(-0.1494026)
+    assert result["momentum"]["net_difference"] == 0
     result = state.consume(event("3", timestamp="00:01:00.000", kind="Pressure"))
     assert result["momentum"]["net_difference"] == 0
     result = state.consume(event("4", kind="Carry", timestamp="00:01:01.000"))
@@ -132,7 +136,7 @@ def test_stream_is_incremental_and_sessions_are_independent():
             assert payloads[0]["simulated_live"] is True
             assert payloads[1]["shot_summary"]["1"]["shots"] == 0
             assert payloads[1]["momentum"]["status"] == "available"
-            assert payloads[2]["momentum"]["net_difference"] == 0
+            assert payloads[2]["momentum"]["net_difference"] == pytest.approx(0.1)
             assert payloads[2]["shot_added"]["event_id"] == "2"
             assert payloads[2]["shot_summary"]["1"]["shots"] == 1
             assert payloads[-1] == {"match_id": 10}
@@ -172,14 +176,17 @@ def test_disconnected_replay_stops_before_processing():
     assert len(messages) == 1
 
 
-def test_per_action_momentum_does_not_accumulate_or_decay():
+def test_minute_peak_momentum_persists_then_expires_without_accumulation():
     state = MatchAnalytics(1, 2)
     first = state.consume(event("1", kind="Carry", carry={"end_location": [115, 40]}))
     value = first["momentum"]["home"]
     for identifier, second, _ in (("2", 15, 2), ("3", 30, 4), ("4", 45, 8)):
         result = state.consume(event(identifier, second=second, kind="Pressure"))
-        assert result["momentum"]["home"] == 0
+        assert result["momentum"]["home"] == pytest.approx(value)
         assert result["momentum"]["action_value"] is None
-    assert first["momentum"]["aggregation"] == "per_action"
-    assert "half_life_seconds" not in first["momentum"]
-    assert first["momentum"]["action_value"] == pytest.approx(value)
+    assert first["momentum"]["aggregation"] == "trailing_minute_peaks"
+    assert first["momentum"]["half_life_seconds"] == 60
+    quiet = state.consume(event("5", timestamp="00:01:00.000", kind="Pressure"))
+    assert quiet["momentum"]["home"] == pytest.approx(value / 3)
+    expired = state.consume(event("6", timestamp="00:04:00.000", kind="Pressure"))
+    assert expired["momentum"]["home"] == 0

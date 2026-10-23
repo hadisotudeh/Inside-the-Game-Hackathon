@@ -42,7 +42,7 @@ function pitch(svg) {
     node("circle",{cx:13,cy:40,r:.5}),node("circle",{cx:107,cy:40,r:.5}));
   svg.append(g);
 }
-function dateLabel(value) { return new Intl.DateTimeFormat("en-GB",{day:"numeric",month:"short",year:"numeric",timeZone:"UTC"}).format(new Date(value+"T00:00:00Z")); }
+function dateLabel(value) { const date=new Date(value+"T00:00:00Z"); return Number.isNaN(date.getTime())?String(value||"Date unavailable"):new Intl.DateTimeFormat("en-GB",{day:"numeric",month:"short",year:"numeric",timeZone:"UTC"}).format(date); }
 function clock(event) { return `${String(event.minute).padStart(2,"0")}:${String(event.second).padStart(2,"0")}`; }
 function side(teamId) { return teamId === match?.home_team.id ? "home" : "away"; }
 
@@ -166,7 +166,7 @@ function clearState() {
   clearTimeout(momentumTimer); momentumTimer=null;
   eventTimeline = [];
   shots = []; history = []; insights = []; count = 0; lastUpdate = null; selectedShotId=null;
-  if(overlayMode)document.dispatchEvent(new CustomEvent("touchline:replay-reset"));
+  document.dispatchEvent(new CustomEvent("touchline:replay-reset"));
   clearGoalHighlight();
   scoreboardGoalIds.clear();
   passingNetworks = {};
@@ -361,7 +361,6 @@ $("followShot").onclick=()=>{
 };
 
 function publishChatContext() {
-  if(!overlayMode)return;
   document.dispatchEvent(new CustomEvent("touchline:context",{detail:lastUpdate&&match?{
     match:{home_team:match.home_team,away_team:match.away_team},
     clock:{minute:lastUpdate.event.minute,second:lastUpdate.event.second,period:lastUpdate.event.period},
@@ -371,12 +370,12 @@ function publishChatContext() {
   }:null}));
 }
 function updateBroadcastVisibility() {
-  if(!overlayMode)return;
   publishChatContext();
+  if(!overlayMode)return;
   const momentumReady=history.some(p=>p.source_values_seen>0);
   for(const [selector,ready] of [[".match-card",count>0],[".action-pitch-card",count>0],[".top-stats",count>0],
     [".momentum-card",momentumReady],[".shot-card",shots.length>0],
-    [".passing-card",Object.values(passingNetworks).some(value=>value.players?.length>0)],[".insights-card",eventTimeline.length>0]]){
+    [".passing-card",Object.values(passingNetworks).some(value=>value.players?.length>0)],[".insights-card",true]]){
     const panel=document.querySelector(selector);
     if(panel)panel.hidden=!ready;
   }
@@ -482,53 +481,84 @@ $("shotPeriod").onchange=drawShots;
 
 function drawMomentum() {
   const svg=$("momentum");svg.replaceChildren();
-  const points=history;
   $("momentumTitle").textContent="Match momentum";
-  $("momentumDescription").textContent="Attacking progression · xT per action.";
-  const latest=history[history.length-1], duration=Math.max(0.001,latest?.elapsed||0);
+  $("momentumDescription").textContent="Recent attacking threat · xT proxy.";
+  // Fit the elapsed replay rather than reserving space for future match events.
+  const latest=history[history.length-1], duration=Math.max(60,latest?.elapsed||0);
   const xAt=p=>Math.max(0,Math.min(900,p.elapsed/duration*900));
   const axis=$("momentumAxis");axis.replaceChildren();
-  const formatTime=seconds=>String(Math.floor(seconds/60));
-  const shownMinutes=new Set();
-  for(let i=0;i<=4;i++){
-    const minute=formatTime((latest?.elapsed||0)*i/4);
-    const label=document.createElement("span");
-    label.textContent=shownMinutes.has(minute)?"":minute;
-    shownMinutes.add(minute);
+  const halftime=history.find(p=>p.period>=2)?.elapsed;
+  const tickStep=[15,30,60,120,300,600,900,1800,3600].find(step=>duration/step<=5)||7200;
+  const ticks=[["0′",0]];
+  for(let seconds=tickStep;seconds<duration;seconds+=tickStep){
+    if(duration-seconds<duration*.1||halftime!==undefined&&Math.abs(seconds-halftime)<duration*.1)continue;
+    ticks.push([seconds%60===0?`${seconds/60}′`:`${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,"0")}`,seconds/duration*100]);
+  }
+  if(halftime!==undefined&&halftime>duration*.08&&halftime<duration*.9)ticks.push(["HT",halftime/duration*100]);
+  const endSeconds=Math.floor(duration);
+  ticks.push([`${Math.floor(endSeconds/60)}:${String(endSeconds%60).padStart(2,"0")}`,100]);
+  for(const [labelText,position] of ticks){
+    const label=document.createElement("span");label.textContent=labelText;
+    label.style.left=`${position}%`;
+    label.style.transform=position===0?"none":position===100?"translateX(-100%)":"translateX(-50%)";
     axis.append(label);
   }
-  history.forEach((p,i)=>{
-    if(i && history[i-1].period!==p.period){
-      const x=xAt(p);
-      svg.append(node("line",{x1:x,y1:4,x2:x,y2:146,stroke:"#e4e4e4","stroke-dasharray":"1 5","stroke-linecap":"round","stroke-width":2}));
+  svg.append(node("defs"));
+  const defs=svg.querySelector("defs");
+  for(const [name,y] of [["home",-30],["away",75]]){
+    const clip=node("clipPath",{id:`momentum-${name}-clip`});
+    clip.append(node("rect",{x:0,y,width:900,height:105}));defs.append(clip);
+  }
+  const periods=new Map(), buckets=new Map();
+  for(const point of history)buckets.set(`${point.period}:${Math.floor(point.period_seconds/60)}`,point);
+  for(const point of buckets.values()){
+    if(!periods.has(point.period))periods.set(point.period,[]);
+    periods.get(point.period).push(point);
+  }
+  const measured=Array.from(buckets.values()).filter(p=>Number.isFinite(p.net_difference));
+  const scale=latest?.cap||0.1;
+  const yAt=value=>75-Math.max(-scale,Math.min(scale,value))/scale*60;
+  function area(points){
+    if(!points.length)return;
+    const coords=points.map(p=>[xAt(p),yAt(p.net_difference)]);
+    if(coords.length===1)coords.push([Math.min(900,coords[0][0]+2),coords[0][1]]);
+    let curve=`M ${coords[0][0]} 75 L ${coords[0][0]} ${coords[0][1]}`;
+    for(let i=1;i<coords.length;i++){
+      const previous=coords[i-1], current=coords[i];
+      curve+=` Q ${previous[0]} ${previous[1]} ${(previous[0]+current[0])/2} ${(previous[1]+current[1])/2}`;
     }
-  });
-  svg.append(node("line",{x1:0,y1:75,x2:900,y2:75,stroke:"#aebcbe","stroke-width":1}));
-  const measured=points.filter(p=>Number.isFinite(p.net_difference));
-  const max=Math.max(0.001,...measured.map(p=>Math.abs(p.net_difference)));
-  const yAt=value=>75-value/max*60;
-  // One mark per action: no accumulation or decay between events.
-  measured.forEach(p=>{
-    if(p.net_difference===0)return;
-    const x=xAt(p),y=yAt(p.net_difference);
-    svg.append(node("line",{x1:x,y1:75,x2:x,y2:y,
-      stroke:colors[p.net_difference>0?"home":"away"],"stroke-width":2}));
-  });
+    const last=coords[coords.length-1];
+    curve+=` L ${last[0]} ${last[1]} L ${last[0]} 75 Z`;
+    for(const team of ["home","away"])svg.append(node("path",{d:curve,fill:colors[team],opacity:.94,"clip-path":`url(#momentum-${team}-clip)`,class:"momentum-area"}));
+  }
+  for(const [period,points] of periods){
+    let segment=[];
+    for(const point of points){
+      if(!Number.isFinite(point.net_difference)){area(segment);segment=[];continue;}
+      segment.push(point);
+    }
+    area(segment);
+    if(period!==1&&points.length){
+      const x=xAt(points[0]);
+      svg.append(node("line",{x1:x,y1:-16,x2:x,y2:168,stroke:"#cbd1d4","stroke-dasharray":"2 6","stroke-width":2}));
+    }
+  }
+  svg.append(node("line",{x1:0,y1:75,x2:900,y2:75,stroke:"#c4cccf","stroke-width":.6}));
   if(!measured.length){
     const seen=history.some(p=>p.source_values_seen>0);
-    const message=!history.length?"Start replay to see attacking progression.":seen?"Movement coordinates missing in this half.":"Waiting for the first action.";
+    const message=!history.length?"Start replay to see attacking threat.":seen?"Missing coordinates in the recent window.":"Waiting for the first action.";
     svg.append(node("text",{x:450,y:56,"text-anchor":"middle",fill:"#627079","font-size":13},message));
   }
-  // Dedicated home/away lanes keep shots aligned with their team.
-  shots.filter(s=>!s.shootout).sort((a,b)=>Number(a.outcome==="Goal")-Number(b.outcome==="Goal")).forEach(s=>{
+  // Goal markers use dedicated lanes above and below the threat area.
+  shots.filter(s=>!s.shootout&&s.outcome==="Goal").sort((a,b)=>Number(a.outcome==="Goal")-Number(b.outcome==="Goal")).forEach(s=>{
     const home=side(s.team_id)==="home", color=colors[home?"home":"away"];
     const xg=Number.isFinite(s.xg)?Math.max(0,Math.min(1,s.xg)):null;
-    // Area grows linearly with xG; the minimum keeps low-xG shots selectable.
+    // Goals use fixed-size football icons; all shot sizes remain on the shot map.
     const goal=s.outcome==="Goal";
-    const radius=Math.max(goal?10:5,Math.sqrt(25+119*(xg??0)));
+    const radius=9;
     const edgePadding=radius+5;
     const x=Math.max(edgePadding,Math.min(900-edgePadding,xAt(s)));
-    const y=home?22:128;
+    const y=home?-12:162;
     const label=`${clock(s)} · ${s.player?.name||"Shot"} · ${s.outcome||"Unknown outcome"} · ${xg===null?"xG unavailable":formatXg(s.xg)+" xG"}`;
     const marker=node("g",{class:`momentum-shot${goal?" momentum-goal":""}`,transform:`translate(${x} ${y})`,
       tabindex:0,role:"button","aria-label":label,"data-event-id":s.event_id});
@@ -546,16 +576,14 @@ function drawMomentum() {
       pattern.append(node("line",{x1:Math.cos(angle)*4,y1:Math.sin(angle)*4,x2:Math.cos(angle)*9,y2:Math.sin(angle)*9}));
     }
     marker.append(pattern);
-      const labelX=Math.max(44,Math.min(856,x))-x, labelY=home?-49:27;
-      marker.append(node("rect",{x:labelX-42,y:labelY,width:84,height:22,rx:11,fill:"#202124"}),
-        node("text",{x:labelX,y:labelY+15,"text-anchor":"middle",fill:"white","font-size":12,"font-weight":700},`GOAL ${s.minute}′`));
+
     }
     const inspect=()=>selectShot(s);
     marker.onclick=inspect;
     marker.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();inspect();}};
     svg.append(marker);
   });
-  svg.setAttribute("aria-label",measured.length?`Net xT difference per action, without time decay; home above, away below. Football markers identify goals.`:"xT momentum: waiting for data");
+  svg.setAttribute("aria-label",measured.length?`Recent attacking threat: home above, away below. Four-minute, recency-weighted xT proxy; not scoring probability. Football markers identify goals.`:"xT momentum: waiting for data");
 }
 function recordTimelineEvent(data) {
   const event=data.event;

@@ -7,7 +7,7 @@ from pathlib import Path
 
 from playwright.async_api import async_playwright
 
-OUT = Path(os.environ.get("TOUCHLINE_DEMO_OUT", "artifacts/demo"))
+OUT = Path(os.environ.get("TOUCHLINE_DEMO_OUT", ".demo-production"))
 
 
 async def main():

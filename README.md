@@ -2,7 +2,12 @@
 
 [![Python checks](https://github.com/hadisotudeh/Inside-the-Game-Hackathon/actions/workflows/checks.yml/badge.svg)](https://github.com/hadisotudeh/Inside-the-Game-Hackathon/actions/workflows/checks.yml)
 
-[Watch demo on YouTube](https://youtu.be/o-lBHqRdArY) · [Download demo video](artifacts/demo/touchline-demo.mp4) · [Demo package](artifacts/demo/README.md) · [Judge testing guide](docs/judging.md) · [Submission checklist and pitch](docs/submission.md)
+[Watch the demo](https://youtu.be/Q1jKv-HsTxo) · [Download demo video](artifacts/demo/touchline-demo.mp4) · [Demo package](docs/demo-package/README.md) · [Judge testing guide](docs/judging.md) · [Submission checklist and pitch](docs/submission.md)
+
+**[Open the live Azure app — no installation](https://touchline-inside-the-game.azurewebsites.net)**
+
+Choose a fixture, press **Start replay**, explore the charts, and ask the match a question.
+The app is already hosted on Azure App Service; chat uses Azure-hosted GPT-4.1 mini through Microsoft Foundry.
 
 ### See the game. Understand the story.
 
@@ -10,13 +15,13 @@
 
 A score tells you what happened. Touchline helps you explore who is creating the danger, how teams connect their passes, and what the numbers mean. Watch the match unfold, inspect the evidence, or ask a question in everyday language.
 
-Built for the **Microsoft × Premier League Inside the Game Developer Hackathon**. The current application is a working local prototype with **Microsoft Agent Framework orchestration, Gemini-powered match questions, historical event replay, and an optional Microsoft Foundry explanation adapter**.
+Built for the **Microsoft × Premier League Inside the Game Developer Hackathon**. The application runs locally and on Azure with **Microsoft Agent Framework orchestration, Azure-hosted GPT-4.1 mini match questions, historical event replay, and an optional Microsoft Foundry explanation adapter**. Gemini remains available for older local configurations.
 
-![Touchline overlay showing Chelsea–Arsenal event positions, chance quality, momentum, passing networks and match questions](docs/images/touchline-overlay.png)
+![Touchline hosted Azure replay showing Chelsea–Arsenal events, the filled momentum chart, passing networks and the default AI interpretation timeline](docs/images/touchline-overlay.png)
 
 ## The demo: a Premier League match, one event at a time
 
-Open **[http://127.0.0.1:8000/overlay](http://127.0.0.1:8000/overlay)** after starting the app.
+Open **[touchline-inside-the-game.azurewebsites.net](https://touchline-inside-the-game.azurewebsites.net)** in your browser. For local development, start the app and open [localhost:8000](http://127.0.0.1:8000/).
 
 The intended experience sits alongside live match footage. To avoid redistributing copyrighted broadcast video, this demonstration uses an **event-data pitch** in its place. This is a visualization of recorded actions, not reconstructed match video or continuous player tracking.
 
@@ -24,9 +29,9 @@ The intended experience sits alongside live match footage. To avoid redistributi
 
 For this case study, Touchline uses **publicly available historical Premier League 2015/16 event data from [Hudl / StatsBomb Open Data](https://github.com/hudl/open-data)**. The recorded demo follows **Chelsea–Arsenal, September 19, 2015**. The server downloads the event file, then streams actions **one at a time, in match order**, through Server-Sent Events (SSE). The score, pitch and analytics update only as events are emitted. This demonstrates the event-processing experience; a production live feed and synchronization with broadcast footage remain future integrations.
 
-The **87-second final demo** shows sequential replay, interactive analytics, and a successful real Gemini answer through Microsoft Agent Framework and all three evidence tools. It uses synthetic narration modeled on Hadi Sotudeh’s own voice, approved by Hadi for this demo, with no speech speed-up. [Download the final video](artifacts/demo/touchline-demo.mp4) or read the [demo package and reproduction instructions](artifacts/demo/README.md). The approved MP4 is included in this repository; private voice references and intermediate media are excluded.
+The **115-second Azure demo** opens the public website, shows sequential replay and interactive analytics, and explains the agent workflow through both real chat answers and automatic narration. The voiceover explains Microsoft Agent Framework, its three evidence tools, Azure GPT-4.1 mini, and structured-response/event-reference checks while showing each AI mode. The replay uses the built-in 15× speed, with a close-up of the dynamic momentum chart. Viewers see the URL, switch between Ask the match and the AI interpretation timeline, and can open the hosted app themselves. It uses synthetic narration modeled on Hadi Sotudeh’s own voice, approved by Hadi for this demo, with a pitch-preserving 12% slower voiceover, complete voice takes, preserved breaths and word endings, consistent volume, and extra time to read AI outputs and the architecture. [Download the final video](artifacts/demo/touchline-demo.mp4) or read the [demo package and reproduction instructions](docs/demo-package/README.md). The approved MP4 is included in this repository; private voice references and intermediate media are excluded.
 
-**[Watch the final demo on YouTube](https://youtu.be/o-lBHqRdArY).**
+**[Watch the latest Azure demo](https://youtu.be/Q1jKv-HsTxo)** or [download the video](artifacts/demo/touchline-demo.mp4).
 
 > **For judges:** the video is a historical-data case study. Run `pipenv run demo` and open [localhost:8012/overlay](http://127.0.0.1:8012/overlay) to test the separate, labeled synthetic build. It uses fictional teams and seed 42 without downloading historical match data. See [step-by-step testing instructions](docs/judging.md).
 
@@ -36,13 +41,16 @@ The **87-second final demo** shows sequential replay, interactive analytics, and
 | --- | --- |
 | Event-data pitch and score | Follow recorded actions, player identities, the replay clock and goals as they arrive. |
 | Shot map | Compare chance locations and supplied expected goals (xG). Larger markers mean higher xG; filled markers identify goals. |
-| Match momentum | See attacking progression from completed open-play passes and carries using expected threat (xT). This is not win probability. |
+| Match momentum | Follow recent attacking threat through a filled, minute-based xT proxy chart, with home/away colors, halftime separation and goal markers. The time axis expands with elapsed play, compressing earlier events as the replay progresses. This is not scoring or win probability. |
 | Top statistics | Compare estimated possession, shots, shots on target, pass completion and field tilt. |
 | Passing network | Explore average pass/reception positions and connections between players; switch the team being inspected. |
 | Shot snapshots | Inspect recorded shot-time player positions where available, rather than implying continuous tracking. |
-| Ask the match | Ask about chance quality, territorial control or player involvement using the match context available so far. |
+| AI interpretation timeline | Receive automatic, timestamped notes grounded in the match snapshot; this is the default panel mode. |
+| Ask the match | Switch modes to ask about chance quality, territorial control or player involvement using the match context available so far. |
 
-The overlay fits a landscape broadcast-style canvas. It starts its own replay and can also receive updates from a matchroom tab in the same browser. The main matchroom is available at **[http://127.0.0.1:8000/](http://127.0.0.1:8000/)**.
+The **Match intelligence** panel starts in **AI interpretation timeline** mode, generating automatic, timestamped notes as replay unfolds. Use its dropdown to switch to **Ask the match** whenever you want to ask a question. Switching modes preserves the replay and existing notes. Interpretations use the same evidence-grounded model workflow as chat; this is not a separate autonomous investigation agent. They run only in timeline mode, with at least five match minutes and 20 wall-clock seconds between successful notes, and at most 12 generation attempts per replay. Resetting starts a fresh timeline.
+
+The overlay fits a landscape broadcast-style canvas. It starts its own replay and can also receive updates from a matchroom tab in the same browser. The main matchroom is available at **[http://127.0.0.1:8000/matchroom](http://127.0.0.1:8000/matchroom)**.
 
 Personalization currently comes from the viewer's questions, team selection and shot exploration. Overlay chat uses casual-fan language; the chat API also supports an analyst mode. Favorite-player profiles and multilingual narration are future work.
 
@@ -56,15 +64,21 @@ Example questions include:
 - **“What does field tilt tell us?”** Explain territorial control in plain language.
 - **“Who is most involved in the passing network?”** Explore the current player-network window.
 
-### Microsoft Agent Framework + Gemini
+### Microsoft Agent Framework + Microsoft Foundry
+
+**Live deployment update (October 23, 2026):** the [hosted app](https://touchline-inside-the-game.azurewebsites.net)
+now uses **Azure-hosted GPT-4.1 mini through Microsoft Foundry** for match questions,
+retaining the same Agent Framework evidence workflow and citation validation.
+Azure inference uses student credit; web hosting remains on the free App Service plan.
+See [Azure configuration](docs/azure-free.md). Gemini remains an optional local provider.
 
 Every question runs through an isolated **[Microsoft Agent Framework workflow](https://learn.microsoft.com/en-us/agent-framework/workflows/workflows)** in [app/chat_workflow.py](app/chat_workflow.py):
 
 1. **Collect evidence.** `MatchEvidence` invokes three read-only tools: `get_match_stats`, `get_recent_events` and `get_player_summary`.
-2. **Generate an explanation.** `MatchNarrator` hands that evidence to the Gemini integration in [app/chat.py](app/chat.py), requesting a short answer for the selected audience.
+2. **Generate an explanation.** `MatchNarrator` hands that evidence to Azure-hosted GPT-4.1 mini through the Foundry integration in [app/chat.py](app/chat.py), requesting a short answer for the selected audience.
 3. **Validate and render.** The backend validates the response schema and checks cited event IDs against the supplied event excerpt. The UI displays the answer's snapshot time and supporting events when supplied.
 
-This is a real Microsoft orchestration integration with a Google model. Tool selection and the handoff are deterministic; the two executors are not presented as independently reasoning autonomous agents. It is not a Microsoft-hosted Gemini deployment.
+The live application uses Microsoft Agent Framework orchestration and Microsoft-hosted model inference. Tool selection and the handoff are deterministic; the two executors are not presented as independently reasoning autonomous agents.
 
 ```mermaid
 flowchart LR
@@ -73,8 +87,8 @@ flowchart LR
     State --> Screen[Overlay and matchroom]
     Screen -->|Question + replay snapshot| Evidence[Agent Framework: evidence tools]
     Evidence --> Narrator[Agent Framework: narrator]
-    Narrator --> Gemini[Gemini inference]
-    Gemini --> Check[Schema and citation checks]
+    Narrator --> Foundry[Microsoft Foundry: Azure GPT-4.1 mini]
+    Foundry --> Check[Schema and citation checks]
     Check --> Screen
 ```
 
@@ -84,13 +98,13 @@ Each question captures the current score, match totals, passing networks and at 
 
 These controls improve traceability, but do not prove every sentence is correct. Aggregate comparisons may have no individual event citations. The prototype currently trusts the viewing client's snapshot; public deployment needs authoritative server-side match sessions.
 
-The final historical-match recording captured **HTTP 200** from Gemini, reporting `Microsoft Agent Framework` and all three evidence tools. The answer compared chance quality at the 37:10 snapshot. Provider failures are displayed as errors; no canned response is passed off as AI output. Replay and analytics continue independently of chat inference.
+The deployed Azure chat has returned **HTTP 200** with `provider=Microsoft Foundry`, deployment `touchline-chat`, `Microsoft Agent Framework` orchestration and all three evidence tools. The earlier Gemini recording remains separate historical evidence. Provider failures are displayed as errors; no canned response is passed off as AI output. Replay and analytics continue independently of chat inference.
 
 ### Optional Microsoft Foundry explanations
 
 A separate shot-triggered explanation path supports casual/analyst output through **Microsoft Foundry**, using Azure OpenAI v1 chat completions and JSON-schema validation. Its local default is a deterministic template marked `ai_generated=false`.
 
-This adapter is implemented but **has not been verified against a real Foundry deployment**. It serves the optional SSE insight path, not the Gemini chat endpoint. See the configuration below before claiming Foundry usage.
+This adapter is implemented but **has not been verified against a real Foundry deployment**. It serves the optional SSE insight path, not the match-question chat endpoint. See the configuration below before claiming Foundry usage.
 
 ## Where Microsoft technologies fit
 
@@ -98,14 +112,15 @@ The working Agent Framework integration provides the foundation. Additional serv
 
 | Microsoft technology | Role in Touchline | Status |
 | --- | --- | --- |
-| **Microsoft Agent Framework** | Coordinate evidence collection and narration, with explicit tool boundaries and a per-question handoff. | **Implemented locally**; real Gemini inference verified in development. |
-| **Microsoft Foundry** | Generate structured explanations for important moments through the existing optional provider. | Adapter implemented; real deployment verification pending. |
-| **Azure Container Apps** | Host the FastAPI application and analytics service. | Proposed; no container image or Azure deployment included yet. |
+| **Microsoft Agent Framework** | Coordinate evidence collection and narration, with explicit tool boundaries and a per-question handoff. | **Implemented and deployed**; real Azure GPT-4.1 mini answers verified through all three tools. |
+| **Microsoft Foundry** | Serve GPT-4.1 mini answers grounded in the replay snapshot. | **Deployed and verified** for chat; the separate optional shot-explanation path remains unverified against a live deployment. |
+| **Azure Container Apps** | Alternative hosting for the FastAPI application and analytics service. | Proposed; no container image or Container Apps deployment included yet. |
+| **Azure App Service** | Host the current FastAPI demo on the free Linux plan in Sweden Central. | **Deployed October 23, 2026**; [open overlay](https://touchline-inside-the-game.azurewebsites.net), [deployment details](docs/azure-free.md). Azure GPT-4.1 mini chat is configured and verified. |
 | **Azure Web PubSub** | Deliver shared match updates to viewer groups rather than independently replaying every connection. | Proposed; requires authoritative sessions, sequencing and recovery. |
 | **Azure Monitor / Application Insights** | Measure event-to-screen latency, workflow errors and model response times. | Proposed; instrumentation and benchmarks remain to be built. |
 | **Azure Key Vault and managed identity** | Manage deployment secrets and access as cloud integrations are introduced. | Proposed; the local app uses server-side environment variables. |
 
-These choices support the hackathon's emphasis on Microsoft AI, explainable intelligence and broadcast applicability. They are a deployment direction, not claims of completed cloud integration. See the [Microsoft integration and deployment plan](docs/microsoft-deployment.md).
+Azure App Service hosting, Foundry chat inference, and Agent Framework orchestration are already deployed. Container Apps, Web PubSub, monitoring and Key Vault remain future options. See the [Microsoft integration and deployment plan](docs/microsoft-deployment.md).
 
 ## Keep routine updates cheap; use AI where it adds value
 
@@ -113,11 +128,11 @@ Touchline can run its replay, charts and statistics locally without an AI key or
 
 The optional Foundry path also limits work: shots trigger explanations, with one request in flight, a default 30-second cooldown and at most 12 requests per replay connection. Its labeled local template mode makes no model calls. These controls apply to that explanation path, not to chat; neither is a global spending cap.
 
-For an Azure pilot, [Container Apps Consumption supports scale-to-zero](https://learn.microsoft.com/azure/container-apps/plans), which could reduce idle compute usage. A live match service still needs a deliberate availability policy, shared state, and tested streaming/recovery behavior. Consumption hosting does not make model inference, data licensing or all supporting services free. No operating-cost benchmark or guaranteed free-tier availability is claimed.
+The live demo uses Azure App Service's free Linux plan in Sweden Central. Azure model inference consumes student credit by token usage. [Deployment details](docs/azure-free.md) describe the current resources and limits. An alternative Container Apps deployment remains future work. A live match service still needs a deliberate availability policy, shared state, and tested streaming/recovery behavior. Consumption hosting does not make model inference, data licensing or all supporting services free. No operating-cost benchmark or guaranteed free-tier availability is claimed.
 
 ## Run locally
 
-For the self-contained synthetic judge build, install dependencies as below, then run `pipenv run demo` instead of `pipenv run dev`. The synthetic overlay is on port **8012**; its replay and analytics need no data-provider credentials or network calls after installation. AI questions require a server-side Gemini key.
+For the self-contained synthetic judge build, install dependencies as below, then run `pipenv run demo` instead of `pipenv run dev`. The synthetic overlay is on port **8012**; its replay and analytics need no data-provider credentials or network calls after installation. AI questions require server-side Azure model credentials or an optional Gemini key.
 
 Requires **Python 3.14**, **Pipenv**, and internet access to retrieve historical fixtures/events. Cloud credentials are optional for the core viewing experience.
 
@@ -131,15 +146,53 @@ If `.env` already exists, retain it and add only the settings you need. The deve
 
 | Address | Purpose |
 | --- | --- |
-| [localhost:8000/overlay](http://127.0.0.1:8000/overlay) | Broadcast-style viewing experience; choose a fixture and press **Start replay**. |
-| [localhost:8000/](http://127.0.0.1:8000/) | Main matchroom. |
+| [localhost:8000/](http://127.0.0.1:8000/) | Broadcast-style viewing experience; choose a fixture and press **Start replay**. |
+| [localhost:8000/matchroom](http://127.0.0.1:8000/matchroom) | Main matchroom. |
 | [localhost:8000/docs](http://127.0.0.1:8000/docs) | Interactive API documentation. |
 | [localhost:8000/health](http://127.0.0.1:8000/health) | Health check: `{"status":"ok"}`. |
 
-The standard overlay offers real time and 2× playback. The recorded case study adds a 60× choice for presentation; the API also accepts accelerated replay directly.
+The overlay and matchroom offer real time, 2× and 15× playback. Choose 15× to build up match evidence faster; the demo uses this same option. The API also accepts other accelerated replay speeds.
 
-### Enable AI questions
+### Enable local AI narration and chat
 
+The hosted app uses Azure GPT-4.1 mini. Localhost needs its own configuration:
+edit `.env` in the project root (beside `README.md`) and set the following values.
+Both the default **AI interpretation timeline** and **Ask the match** use these settings.
+
+If `.env` does not exist yet, create it with `cp .env.example .env`. If it already
+exists, edit the existing entries instead of adding duplicate settings.
+
+```dotenv
+GAME_CHAT_PROVIDER=foundry
+GAME_FOUNDRY_ENDPOINT=https://YOUR-RESOURCE.openai.azure.com
+GAME_FOUNDRY_DEPLOYMENT=YOUR-DEPLOYMENT-NAME
+GAME_FOUNDRY_API_KEY=YOUR_AZURE_RESOURCE_KEY
+```
+
+For the existing Touchline Azure resource, the endpoint is
+`https://touchline-inside-game-ai.openai.azure.com` and the deployment name is
+`touchline-chat`. Other developers should use their own resource and deployment.
+Copy your resource key from Azure's **Keys and Endpoint** section into
+`GAME_FOUNDRY_API_KEY`; the public hosted-app URL is not a model endpoint or API key.
+
+Use the endpoint, deployment name and resource key from your Azure resource;
+credentials configured on the hosted app are not automatically available locally.
+After saving `.env`, stop the running local server with **Ctrl+C** and restart it:
+
+```bash
+pipenv run dev
+```
+
+Open `http://127.0.0.1:8000`, select a fixture and press **Start replay**. The timeline
+waits until the first match minute and some events have arrived before generating
+its first interpretation. With no working model credentials, charts and replay
+still work, but AI text cannot be generated. See [Azure configuration](docs/azure-free.md).
+
+`GAME_EXPLANATION_PROVIDER` controls a separate optional shot-insights feature;
+it does not enable the dropdown's narration timeline or chat. Keep keys on the
+server in the ignored `.env` file, never in the browser or Git.
+
+For the optional legacy Gemini provider, set `GAME_CHAT_PROVIDER=gemini`.
 Add a server-side Gemini key to `.env`, then restart the application:
 
 ```dotenv
@@ -187,7 +240,7 @@ curl -N 'http://127.0.0.1:8000/matches/3754217/stream?speed=60&insights=true&aud
 
 Replay connections have independent state. Disconnecting cancels replay; reconnecting starts again from kick-off. Resume, shared server sessions and production broadcast-clock synchronization are not implemented. The in-browser BroadcastChannel supports same-browser tabs, not independent OBS browser sources or viewers on another device.
 
-StatsBomb xG is supplied by the dataset. xT uses the public pretrained 12×8 grid described in [the model notes](docs/xt-model.md), without fitting on the replayed match. Momentum measures signed per-action progression, not defensive value or scoring probability. Shot-map display places home attacks toward the right and away attacks toward the left; shot snapshots use their own period-specific direction convention. Missing coordinates/snapshots are not inferred as tracking data.
+StatsBomb xG is supplied by the dataset. xT uses the public pretrained 12×8 grid described in [the model notes](docs/xt-model.md), without fitting on the replayed match. Momentum compares capped location-xT minute peaks over a recency-weighted four-minute window. Its filled chart is inspired by FotMob’s presentation; it uses our own proxy, not FotMob’s proprietary calculation or a scoring probability. Shot-map display places home attacks toward the right and away attacks toward the left; shot snapshots use their own period-specific direction convention. Missing coordinates/snapshots are not inferred as tracking data.
 
 ## Hackathon alignment and remaining work
 
@@ -212,7 +265,7 @@ Before submission:
 
 ## Development and project map
 
-Validation on October 22, 2026: **52 tests pass** locally. GitHub Actions runs lock verification, lint, formatting, and tests on pushes and pull requests. Check the workflow for the submitted commit; the badge above reflects GitHub status.
+Validation on October 23, 2026: **58 tests pass** locally. GitHub Actions runs lock verification, lint, formatting, and tests on pushes and pull requests. Check the workflow for the submitted commit; the badge above reflects GitHub status.
 
 ```bash
 pipenv run test
@@ -227,7 +280,7 @@ Dependencies are managed with Pipenv; commit `Pipfile` and `Pipfile.lock`. For d
 | [app/main.py](app/main.py) | FastAPI routes and application wiring. |
 | [app/source.py](app/source.py), [app/replay.py](app/replay.py) | Historical data ingestion and ordered streaming. |
 | [app/analytics.py](app/analytics.py), [app/passing.py](app/passing.py) | Incremental match calculations and passing networks. |
-| [app/chat_workflow.py](app/chat_workflow.py), [app/chat.py](app/chat.py) | Agent Framework orchestration, Gemini inference and citation checks. |
+| [app/chat_workflow.py](app/chat_workflow.py), [app/chat.py](app/chat.py) | Agent Framework orchestration, Azure Foundry/Gemini providers and citation checks. |
 | [app/explanations.py](app/explanations.py) | Optional template/Foundry shot explanations. |
 | [app/static/](app/static/) | Overlay, matchroom, charts and chat interface. |
 | [tests/](tests/) | Replay, analytics, source, workflow and provider tests. |

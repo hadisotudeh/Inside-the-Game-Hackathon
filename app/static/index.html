@@ -7,6 +7,7 @@
   <meta name="description" content="Replay Premier League matches with shot maps, attacking momentum and match commentary.">
   <link rel="stylesheet" href="/static/style.css?v=momentum-explanation-3">
   <script src="/static/app.js" defer></script>
+  <script src="/static/chat.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#analysis">Skip to analysis</a>
@@ -19,7 +20,7 @@
     <div class="page-heading"><div><p class="breadcrumb">Football <span aria-hidden="true">/</span> Premier League <span aria-hidden="true">/</span> 2015/16</p></div><p class="replay-note" id="provenance">Live event replay</p></div>
     <section class="control-bar" aria-label="Replay controls">
       <label class="match-select" for="match">Match<select id="match"><option>Loading matches…</option></select></label>
-      <label class="speed-select" for="speed">Speed<select id="speed"><option value="1">1× · Real time</option><option value="2" selected>2×</option></select></label>
+      <label class="speed-select" for="speed">Speed<select id="speed"><option value="1">1× · Real time</option><option value="2" selected>2×</option><option value="15">15×</option></select></label>
       <div class="playback-buttons"><button id="retryFixtures" class="secondary" hidden>Retry loading</button><button id="play" class="primary" disabled>Start replay</button><button id="reset" class="secondary" aria-label="Reset replay to kick-off" title="Reset to kick-off">Reset</button></div>
     </section>
     <div class="context-row"><span id="status" role="status">Loading matches from StatsBomb…</span><span class="data-delay">Events appear in match order. No spoilers.</span></div>
@@ -34,11 +35,11 @@
         <div class="score-event-status"><span class="tiny-dot home-dot" aria-hidden="true"></span><span id="latestAction">Waiting for kick-off</span></div>
       </section>
       <section class="momentum-card panel" id="momentumSection" aria-labelledby="momentumTitle">
-        <div class="section-heading"><div><h2 id="momentumTitle">Match momentum</h2><p id="momentumDescription">Attacking progression · xT per action.</p></div><button id="method" class="text-button" aria-expanded="false" aria-controls="methodNote">How it works</button></div>
-        <div class="momentum-legends"><div class="momentum-key"><span><i class="tiny-dot home-dot" aria-hidden="true"></i><span id="homeLegend">Home</span></span><span><i class="tiny-dot away-dot" aria-hidden="true"></i><span id="awayLegend">Away</span></span></div><span class="momentum-event-key">○ Shot · ⚽ GOAL · size reflects xG</span></div>
-        <svg id="momentum" viewBox="0 -30 900 210" role="img" aria-label="Net attacking progression: home minus away"></svg>
+        <div class="section-heading"><div><h2 id="momentumTitle">Match momentum</h2><p id="momentumDescription">Recent attacking threat · xT proxy.</p></div><button id="method" class="text-button" aria-expanded="false" aria-controls="methodNote">How it works</button></div>
+        <div class="momentum-legends"><div class="momentum-key"><span><i class="tiny-dot home-dot" aria-hidden="true"></i><span id="homeLegend">Home</span></span><span><i class="tiny-dot away-dot" aria-hidden="true"></i><span id="awayLegend">Away</span></span></div><span class="momentum-event-key">⚽ Goal · select to inspect the shot</span></div>
+        <svg id="momentum" viewBox="0 -30 900 210" role="img" aria-label="Recent attacking threat: home minus away"></svg>
         <div class="axis" id="momentumAxis"><span>0′</span><span>0′</span></div>
-        <p id="methodNote" class="method-note" hidden>Each mark shows the xT change from one completed open-play pass or carry: home minus away. Positive values use the home color; negative values use the away color. Backward moves can favor the opponent. Values are not accumulated or faded over time. Shots, failed passes and restarts are excluded. This measures progression, not possession or scoring probability.</p>
+        <p id="methodNote" class="method-note" hidden>Each minute uses each team's highest observed location-based threat from completed open-play passes, carries and shots. We compare recency-weighted peaks over the latest four minutes, capped at 0.1 per team-minute. The home team is above the baseline; away is below. Quiet minutes reduce earlier pressure, and each half starts fresh. This is our xT-based proxy, not FotMob's model or a scoring probability. Missing coordinates create gaps.</p>
       </section>
       <section class="shot-card panel" id="shots" aria-labelledby="shotsTitle">
         <div class="section-heading"><div><h2 id="shotsTitle">Shots</h2><p>Where chances are created, and how good they are.</p></div><div class="segmented" role="group" aria-label="Filter shots by team"><button data-filter="all" class="active" aria-pressed="true">All</button><button data-filter="home" aria-pressed="false">Home</button><button data-filter="away" aria-pressed="false">Away</button></div></div>
@@ -82,13 +83,24 @@
         <p class="passing-note">Larger circles = more pass involvement. Thicker lines = more completed passes between players. Resets after this team’s substitutions or sending-offs. Hover or focus for names and counts.</p>
       </section>
       <aside class="insights-card panel" id="commentary" aria-labelledby="commentaryTitle">
-        <div class="section-heading"><div><h2 id="commentaryTitle">Match notes</h2><p>Live event timeline · latest first.</p></div></div>
-        <div id="insightList" aria-live="polite"><div class="empty-insight"><div class="empty-rule" aria-hidden="true"></div><h3>No notes yet</h3><p>Recorded actions will appear here as the replay unfolds.</p></div></div>
-        <div class="insight-footer"><span id="providerLabel">Live event timeline</span><span class="provider-detail">Based on events shown so far.</span></div>
+        <div class="section-heading"><div><h2 id="commentaryTitle">Match intelligence</h2><p id="intelligenceHint">AI interpretations as the replay unfolds · latest first.</p></div></div>
+        <div class="chat-controls"><label for="intelligenceMode">Mode</label><select id="intelligenceMode"><option value="timeline" selected>AI interpretation timeline</option><option value="ask">Ask the match</option></select></div>
+        <div id="askMode" class="intelligence-view" hidden>
+        <div class="chat-suggestions" aria-label="Suggested questions"><button type="button" data-question="Who has created the better chances so far?">Better chances?</button><button type="button" data-question="What does field tilt tell us so far?">Explain field tilt</button></div>
+        <div id="chatReply" class="chat-reply" aria-live="polite"></div>
+        <form id="chatForm" class="chat-form"><label class="chat-input-label" for="chatQuestion">Your question</label><div><input id="chatQuestion" maxlength="500" placeholder="Ask about the match so far." required autocomplete="off"><button id="chatSend" type="submit">Ask</button></div></form>
+        <p id="chatStatus" class="chat-status" role="status"></p>
+        </div>
+        <div id="timelineMode" class="intelligence-view">
+          <div id="aiTimeline" class="ai-timeline" aria-live="polite"></div>
+          <p id="timelineStatus" class="chat-status" role="status">Start replay to receive AI interpretations.</p>
+        </div>
+        <div hidden id="insightList" aria-live="polite"><div class="empty-insight"><div class="empty-rule" aria-hidden="true"></div><h3>No notes yet</h3><p>Recorded actions will appear here as the replay unfolds.</p></div></div>
+        <div hidden class="insight-footer"><span id="providerLabel">Live event timeline</span><span class="provider-detail">Based on events shown so far.</span></div>
       </aside>
       </div>
     </div>
-    <footer><a class="footer-brand" href="/">touchline.</a><div class="source-credit"><span>Publicly available match data by</span><a href="https://github.com/hudl/open-data" target="_blank" rel="noopener"><img src="/static/assets/statsbomb.png?v=hudl-original" alt="StatsBomb" width="118" height="26"></a></div><div class="footer-links"><a href="/static/assets/sources.json" target="_blank" rel="noopener">Crest credits</a><a href="/docs" target="_blank" rel="noopener">API documentation</a></div></footer>
+    <footer><a class="footer-brand" href="/">touchline.</a><div class="source-credit"><span>Publicly available match data by</span><a href="https://github.com/hudl/open-data" target="_blank" rel="noopener"><img src="/static/assets/statsbomb.png?v=hudl-original" alt="StatsBomb" width="118" height="26"></a></div><span class="developer-credit">Developed by <a href="https://www.linkedin.com/in/hadisotudeh" target="_blank" rel="noopener noreferrer">Hadi Sotudeh</a></span><div class="footer-links"><a href="/static/assets/sources.json" target="_blank" rel="noopener">Crest credits</a><a href="/docs" target="_blank" rel="noopener">API documentation</a></div></footer>
   </main>
 </body>
 </html>

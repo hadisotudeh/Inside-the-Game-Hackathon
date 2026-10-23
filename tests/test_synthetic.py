@@ -107,7 +107,12 @@ def test_viewing_routes_use_statsbomb_only():
     app.state.source = Source()
     with TestClient(app) as client:
         html = client.get("/").text
-        assert "Touchline — Match analysis" in html
+        assert "Touchline · Live stats overlay" in html
+        assert 'data-overlay="true"' in html
+        assert "Touchline — Match analysis" in client.get("/matchroom").text
+        redirect = client.get("/overlay", follow_redirects=False)
+        assert redirect.status_code == 308
+        assert redirect.headers["location"] == "/"
         assert 'id="source"' not in html
         assert 'alt="StatsBomb"' in html
         overlay = client.get("/overlay")

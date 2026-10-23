@@ -4,7 +4,8 @@ from copy import deepcopy
 from math import isfinite
 
 from app.passing import PassingNetworks
-from app.xt import MODEL_ID, action_xt, movement
+from app.peak_momentum import PeakMomentum
+from app.xt import MODEL_ID, action_xt
 
 
 def shot_freeze_frame(shot: dict) -> list[dict]:
@@ -37,12 +38,10 @@ def period_seconds(event: dict) -> float:
 class MatchAnalytics:
     def __init__(self, home_id: int, away_id: int):
         self.team_ids = (home_id, away_id)
+        self.peak_momentum = PeakMomentum(self.team_ids)
         self.period = None
-        self.totals = {team: 0.0 for team in self.team_ids}
         self.counts = {team: 0 for team in self.team_ids}
         self.last_time = None
-        self.values_seen = 0
-        self.missing = set()
         self.seen = set()
         self.shots = []
         self.score = {str(team): 0 for team in self.team_ids}
@@ -65,8 +64,6 @@ class MatchAnalytics:
         now = period_seconds(event)
         period = event["period"]
         if event["id"] not in self.seen:
-            self.totals = {team: 0.0 for team in self.team_ids}
-            self.missing.clear()
             previous = self.possession_previous
             if previous is not None and previous[0] == period and period != 5:
                 _, previous_time, owner = previous
@@ -85,9 +82,7 @@ class MatchAnalytics:
             previous_time = previous[1] if previous and previous[0] == period else now
             self.possession_previous = (period, max(now, previous_time), owner)
         if self.period != period:
-            self.totals = {team: 0.0 for team in self.team_ids}
             self.counts = {team: 0 for team in self.team_ids}
-            self.missing.clear()
             self.last_time = None
             self.period = period
         now = max(now, self.last_time if self.last_time is not None else now)
@@ -95,8 +90,6 @@ class MatchAnalytics:
         action_value = None
         added_shot = None
         if event["id"] not in self.seen:
-            self.totals = {team: 0.0 for team in self.team_ids}
-            self.missing.clear()
             self.seen.add(event["id"])
             self.passing_networks.consume(event)
             team = event.get("team", {}).get("id")
@@ -113,12 +106,8 @@ class MatchAnalytics:
             if team in self.team_ids and period != 5:
                 value = action_xt(event)
                 if value is not None:
-                    self.totals[team] += value
                     self.counts[team] += 1
                     action_value = value
-                    self.values_seen += 1
-                elif movement(event) is not None:
-                    self.missing.add(team)
             if event["type"]["name"] == "Shot" and team in self.team_ids:
                 details = event["shot"]
                 location = event.get("location")
@@ -139,12 +128,7 @@ class MatchAnalytics:
                     "end_location": details.get("end_location"),
                 }
                 self.shots.append(added_shot)
-        missing_teams = self.missing
-        home, away = (
-            None if team in missing_teams else self.totals[team] for team in self.team_ids
-        )
-        difference = home - away if home is not None and away is not None else None
-        status = "available" if not missing_teams else "incomplete"
+        momentum = self.peak_momentum.consume(event, now)
         possession_total = sum(self.possession_seconds.values())
         final_third_total = sum(stats["final_third_passes"] for stats in self.match_stats.values())
         result = {
@@ -175,19 +159,12 @@ class MatchAnalytics:
             },
             "score": dict(self.score),
             "momentum": {
+                **momentum,
                 "period": period,
                 "period_seconds": now,
                 "action_value": action_value,
-                "metric": "xt",
                 "model": MODEL_ID,
-                "missing_movements": len(self.missing),
-                "aggregation": "per_action",
-                "status": status,
-                "home": home,
-                "away": away,
-                "net_difference": difference,
                 "period_observations": {str(team): self.counts[team] for team in self.team_ids},
-                "source_values_seen": self.values_seen,
             },
             "shot_added": added_shot,
             "shot_summary": {

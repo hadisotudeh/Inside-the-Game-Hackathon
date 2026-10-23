@@ -13,10 +13,10 @@ import scipy.io.wavfile
 import torch
 from pocket_tts import TTSModel, export_model_state
 
-BASE = Path("artifacts/demo")
+BASE = Path(".demo-production")
 OUT = BASE / "production/voice"
 REFERENCE = OUT / "reference.wav"
-VIDEO = BASE / "touchline-demo.mp4"
+VIDEO = Path("artifacts/demo/touchline-demo.mp4")
 MODEL = "english_2026-09_2"
 
 
@@ -61,18 +61,14 @@ def picture_hash(path):
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     timeline = json.loads((BASE / "timeline.json").read_text())
+    natural_timing = os.environ.get("TOUCHLINE_DEMO_NATURAL_TIMING") == "1"
+    narration_only = os.environ.get("TOUCHLINE_DEMO_NARRATION_ONLY") == "1"
+    cursor = 0.3
     reference_hash = hashlib.sha256(REFERENCE.read_bytes()).hexdigest()
     print("Loading local voice-cloning model", MODEL, flush=True)
     torch.set_num_threads(2)
     torch.manual_seed(42)
     model = TTSModel.load_model(language=MODEL)
-    if not model.has_voice_cloning:
-        raise SystemExit(
-            "Voice-cloning weights require access: accept the terms at "
-            "https://huggingface.co/kyutai/pocket-tts, then run "
-            "HF_HOME=/tmp/touchline-clone-cache "
-            "/tmp/touchline-clone-env/bin/hf auth login in your terminal."
-        )
     state_path = OUT / "voice-state.safetensors"
     state_meta = OUT / "voice-state.json"
     signature = {"reference_sha256": reference_hash, "model": MODEL}
@@ -83,6 +79,13 @@ def main():
     ):
         state = model.get_state_for_audio_prompt(state_path)
     else:
+        if not model.has_voice_cloning:
+            raise SystemExit(
+                "Creating a new voice state requires access: accept the terms at "
+                "https://huggingface.co/kyutai/pocket-tts, then run "
+                "HF_HOME=/tmp/touchline-clone-cache "
+                "/tmp/touchline-demo-env/bin/hf auth login in your terminal."
+            )
         state = model.get_state_for_audio_prompt(REFERENCE)
         export_model_state(state, state_path)
         state_meta.write_text(json.dumps(signature, indent=2) + "\n")
@@ -115,6 +118,12 @@ def main():
             )
             print("Natural-speed preview ready:", OUT / "voice-preview.wav", flush=True)
         natural_duration = duration(path)
+        if natural_timing:
+            # Recompute from the take, so repeated exports do not accumulate
+            # padding from older chapter timings. The final mix sets its joins.
+            slot = natural_duration + 0.18
+            part["start"], part["end"] = cursor, cursor + slot
+            cursor = part["end"]
         budget = part["end"] - part["start"] - 0.12
         tempo = max(1.0, natural_duration / budget)
         if tempo > 2:
@@ -137,6 +146,11 @@ def main():
         print(
             f"Chapter {i + 1}: natural {natural_duration:.2f}s; fit factor {tempo:.3f}", flush=True
         )
+    if natural_timing:
+        timeline["duration"] = round(cursor + 1.2, 3)
+        if timeline["duration"] >= 120:
+            raise RuntimeError("Shorten the script to keep natural speech below two minutes")
+        (BASE / "timeline.json").write_text(json.dumps(timeline, indent=2) + "\n")
     total = timeline["duration"]
     filters.append(
         "".join(f"[a{i}]" for i in range(len(chapters)))
@@ -157,11 +171,34 @@ def main():
             "[out]",
             "-ar",
             "48000",
+            "-t",
+            str(total),
             str(narration),
         ],
         check=True,
     )
     final = OUT / "touchline-demo.render.mp4"
+    if narration_only:
+        import shutil
+
+        shutil.copy2(narration, BASE / "narration.wav")
+        (BASE / "narration-report.json").write_text(
+            json.dumps(
+                {
+                    "model": MODEL,
+                    "reference_sha256": reference_hash,
+                    "generation": "Synthetic speech using Hadi's authorized voice reference.",
+                    "duration": total,
+                    "chapters": chapters,
+                    "timing": "Natural speech; chapter visuals retimed to fit, with no speed-up.",
+                    "output": str(BASE / "narration.wav"),
+                },
+                indent=2,
+            )
+            + "\n"
+        )
+        print("Narration ready for a fresh live recording:", total, flush=True)
+        return
     subprocess.run(
         [
             "ffmpeg",
