@@ -13,7 +13,7 @@ Live stats, match stories, and answers for football fans and commentators.
 
 Touchline brings shot maps, attacking momentum, passing networks, and AI match notes into one screen. Follow the notes as play develops, select a shot for a closer look, or switch to **Ask the match** with a question of your own.
 
-Built by **Hadi Sotudeh** for the **Microsoft × Premier League Inside the Game Developer Hackathon**, using Python/FastAPI, Microsoft Agent Framework, and Azure-hosted GPT-4.1 mini through Microsoft Foundry. The current demo replays historical events as they arrive; a licensed live feed is planned.
+Built by **[Hadi Sotudeh](https://www.linkedin.com/in/hadisotudeh)** for the **Microsoft × Premier League Inside the Game Developer Hackathon**, using Python/FastAPI, Microsoft Agent Framework, and Azure-hosted GPT-4.1 mini through Microsoft Foundry. The current demo replays historical events as they arrive; a licensed live feed is planned.
 
 ![Touchline hosted Azure replay showing Chelsea–Arsenal events, the filled momentum chart, passing networks and the default AI interpretation timeline](docs/images/touchline-overlay.png)
 
